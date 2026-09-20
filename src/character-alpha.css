@@ -1,0 +1,2 @@
+/* Media visibility only; the approved portfolio layout is unchanged. */
+#intro[data-webgl=ready] .alpha-poster,#tie-adjust[data-webgl=ready] .alpha-poster{opacity:0}

@@ -1,0 +1,21 @@
+/* Scoped experiment: all work/about/contact rules remain untouched. */
+#intro.cinematic-hero{background:#080b12;min-height:740px;padding-top:34px;overflow:hidden}
+#intro .webgl-studio{position:absolute;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+#intro .studio-glow,#intro .studio-grain{display:none}
+#intro .hero-content{position:relative;z-index:1;grid-template-columns:.87fr 1.13fr;min-height:590px}
+#intro .hero-copy{padding:20px 0 40px}
+#intro h1{font-size:clamp(62px,6.8vw,101px);line-height:1.02;letter-spacing:-.065em;margin-top:25px}
+#intro .intro-greeting{display:block;font-size:.33em;letter-spacing:-.025em;line-height:1.3;margin-bottom:13px;font-weight:400;color:#bcc7d6}
+#intro .intro-name{display:block}
+#intro .hero-role{font-size:27px;margin-top:23px}
+#intro .hero-specialties{font-size:14px;line-height:1.8}
+#intro .entrance-scene{width:113%;margin-left:-7%;aspect-ratio:16/9}
+#intro .portrait-frame .entrance-figure{opacity:1;mix-blend-mode:normal!important;mask-image:linear-gradient(to right,transparent,#000 14%,#000 89%,transparent),linear-gradient(to bottom,transparent,#000 3.5%,#000 97.8%,transparent)!important}
+#intro[data-webgl=ready] .entrance-figure{opacity:0}
+#intro .intro-controls,#intro .film-meta,#intro .voice-note,#intro .intro-transcript,#intro .voice-status{position:relative;z-index:2}
+#intro .film-meta{margin-top:10px}
+#intro .hero-bottom{position:relative;z-index:2}
+#intro .scene-mask{z-index:3;pointer-events:none}
+@media(min-width:1600px){#intro.cinematic-hero{min-height:800px}#intro .hero-content{min-height:650px}}
+@media(max-width:1099px) and (min-width:700px){#intro.cinematic-hero{min-height:700px}#intro .hero-content{grid-template-columns:.9fr 1.1fr;min-height:570px}#intro h1{font-size:clamp(62px,8vw,86px)}#intro .entrance-scene{width:123%;margin-left:-13%}#intro .hero-specialties{max-width:270px}}
+@media(max-width:699px){#intro.cinematic-hero{min-height:0;padding-top:20px}#intro .hero-content{min-height:0}#intro .hero-copy{padding:10px 0 0}#intro h1{font-size:clamp(60px,16.2vw,98px);margin-top:18px;overflow-wrap:anywhere}#intro .intro-greeting{font-size:.38em;margin-bottom:10px}#intro .hero-role{font-size:24px;margin-top:17px}#intro .hero-specialties{font-size:13px}#intro .hero-description{font-size:16px;margin-top:15px}#intro .hero-topics{margin-top:20px}#intro .character-area{margin-top:22px}#intro .entrance-scene{width:113.6%;margin-left:-6.8%}#intro .intro-controls{justify-content:flex-start}#intro .hero-bottom{margin-top:12px}}

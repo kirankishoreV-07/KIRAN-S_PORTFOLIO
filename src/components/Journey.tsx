@@ -1,0 +1,18 @@
+import {useLayoutEffect,useRef,useState} from 'react';
+import gsap from 'gsap';import {ScrollTrigger} from 'gsap/ScrollTrigger';
+import {journey} from '../data';import {SceneArt} from './SceneArt';
+gsap.registerPlugin(ScrollTrigger);
+export function Journey({motion}:{motion:boolean}){
+ const root=useRef<HTMLElement>(null),trigger=useRef<ScrollTrigger|null>(null),art=useRef({progress:0,selection:0});const [active,setActive]=useState(0);art.current.selection=active;
+ useLayoutEffect(()=>{if(!motion)return;const mm=gsap.matchMedia();mm.add('(min-width:1024px) and (min-height:600px)',()=>{const tween=gsap.to(art.current,{progress:1,ease:'none',scrollTrigger:{trigger:root.current,pin:'.journey-stage',start:'top top',end:'+=1400',scrub:.6,onUpdate:self=>setActive(Math.min(2,Math.floor(self.progress*2.99)))}});trigger.current=tween.scrollTrigger!;root.current?.classList.add('journey-pinned');return()=>{trigger.current=null;root.current?.classList.remove('journey-pinned');};});const ctx=gsap.context(()=>{gsap.fromTo('.journey-heading, .journey-rail',{y:45,opacity:1},{y:0,opacity:1,duration:1.1,stagger:.17,ease:'power3.out',scrollTrigger:{trigger:root.current,start:'top 78%',once:true}});gsap.fromTo('.scene-art-journey',{scale:.9,opacity:.15},{scale:1,opacity:1,duration:1.8,ease:'power3.out',scrollTrigger:{trigger:root.current,start:'top 75%',once:true}});},root);return()=>{mm.revert();ctx.revert();};},[motion]);
+ const select=(i:number)=>{setActive(i);const t=trigger.current;if(t)window.scrollTo({top:t.start+(t.end-t.start)*(i+.2)/3,behavior:'instant'});};
+ return <section id="journey" ref={root} className="journey poster-chapter"><div className="journey-stage">
+  <SceneArt kind="journey" motion={motion} state={art.current}/>
+  <div className="chapter-bar"><span>02 / THE JOURNEY</span><span>ERODE → COIMBATORE</span></div>
+  <div className="journey-heading"><p className="eyebrow">EVERY IDEA HAS AN ORIGIN</p><h2>Curiosity.<br/><em>In motion.</em></h2><p className="chapter-intro">A few places. A changing perspective.<br/>One constant: the urge to understand.</p></div>
+  <div className="journey-dial-label" aria-hidden="true"><span>{active===0?'THE FOUNDATION':active===1?'A NEW DIRECTION':'BUILDING WHAT’S NEXT'}</span><b>{active===0?'BEGIN':active===1?'2021':'2023'}</b><span>{active===2?'→ 2027 / CURRENTLY PURSUING':'CHAPTER 0'+(active+1)}</span></div>
+  <div className="journey-console"><div className="journey-rail" role="tablist" aria-label="Education timeline" onKeyDown={e=>{if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();const i=(active+(e.key==='ArrowRight'?1:2))%3;select(i);root.current?.querySelectorAll<HTMLButtonElement>('.journey-node')[i]?.focus();}}}><div className="journey-line" aria-hidden="true"><span style={{width:`${(active+1)/3*100}%`}}/></div>{journey.map((stop,i)=><button key={stop.id} id={'tab-'+stop.id} role="tab" tabIndex={active===i?0:-1} aria-selected={active===i} aria-controls={'journey-card-'+stop.id} className={'journey-node'+(active===i?' is-active':'')} onClick={()=>select(i)}><span>0{i+1}</span><span className="journey-node-dot"/><span>{i===0?'Foundation':i===1?'Direction':'Engineering AI'}</span></button>)}</div>
+  <div className="journey-track">{journey.map((stop,i)=><article role="tabpanel" aria-labelledby={'tab-'+stop.id} hidden={active!==i} key={stop.id} id={'journey-card-'+stop.id} className="journey-card is-active"><span className="journey-card-period">{stop.period}</span><h3>{stop.place}</h3><p>{stop.body}</p><div className="journey-tags">{stop.tags.map(t=><span key={t}>{t}</span>)}</div></article>)}</div></div>
+  <div className="chapter-bottom"><span>SCROLL THROUGH THE CHAPTERS ↓</span><span>0{active+1} / 03</span></div>
+ </div></section>;
+}

@@ -1,0 +1,26 @@
+# dependencies
+node_modules/
+
+# build output
+dist/
+*.tsbuildinfo
+
+# test artifacts
+test-results/
+playwright-report/
+
+# local dev docs and asset-processing pipeline (not needed to build or deploy)
+.research/
+docs/
+references/
+scripts/
+BUILD_PROMPT.md
+DESIGN_PLAN.md
+START_HERE.md
+portfolio-research-notes.md
+
+# os / editor
+.DS_Store
+.vscode/
+.idea/
+*.log
