@@ -4,6 +4,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { projects, type Project } from '../data';
 import { ProjectVisual } from './ProjectVisual';
 import {SceneArt} from './SceneArt';
+import { IconArrowUpRight, IconArrowDown } from './icons';
 gsap.registerPlugin(ScrollTrigger);
 export function Work({motion,onOpen}:{motion:boolean;onOpen:(p:Project)=>void}){
  const root=useRef<HTMLElement>(null),track=useRef<HTMLDivElement>(null);
@@ -54,7 +55,7 @@ export function Work({motion,onOpen}:{motion:boolean;onOpen:(p:Project)=>void}){
  <header className="work-header"><div><p className="eyebrow"><span className="accent">THE PROJECT ROOM /</span></p><h2 id="work-title">IDEAS.<br/><span>IN THE REAL WORLD.</span></h2></div><p>Five projects. Different challenges.<br/>Built with curiosity. Made with purpose.</p></header>
  <nav className="project-nav" aria-label="Choose a project">{projects.map((p,i)=><button key={p.id} onClick={()=>go(i)} aria-label={'Show '+p.title} aria-current={active===i?'true':undefined}><span>0{i+1}</span><span>{p.title}</span></button>)}</nav>
  <div className="gallery-window"><div className="project-track" ref={track}>{projects.map((p,i)=><article className={'project-card'+(active===i?' is-active':'')} id={p.id} key={p.id} style={{'--project-color':p.color} as React.CSSProperties} onFocusCapture={()=>{if(trigger.current&&active!==i)go(i);}}>
- <ProjectVisual project={p}/><div className="project-copy"><div className="project-index">0{i+1} <span>/ 05</span></div><p className="eyebrow">{p.category}</p><h3>{p.title}</h3><p className="project-summary">{p.summary}</p><div className="tags">{p.tags.map(t=><span key={t}>{t}</span>)}</div>{p.id==='sign-language'&&<p className="metric-note"><strong>94.44%</strong> repository-reported validation · 17/18 clips · six classes</p>}<div className="project-actions"><button onClick={()=>onOpen(p)}>Explore case study <span>↗</span></button><a href={p.links[0].url} target="_blank" rel="noreferrer" aria-label={'View '+p.title+' source'}>Source ↗</a></div></div>
- </article>)}</div></div><div className="gallery-footer"><span>SCROLL TO EXPLORE <span aria-hidden="true">↓</span></span><div className="progress-line"><span ref={progress}/></div><span>0{active+1} <span className="counter-divider">/</span> 05</span></div>
+ <ProjectVisual project={p}/><div className="project-copy"><div className="project-index">0{i+1} <span>/ 05</span></div><p className="eyebrow">{p.category}</p><h3>{p.title}</h3><p className="project-summary">{p.summary}</p><div className="tags">{p.tags.map(t=><span key={t}>{t}</span>)}</div>{p.id==='sign-language'&&<p className="metric-note"><strong>94.44%</strong> repository-reported validation · 17/18 clips · six classes</p>}<div className="project-actions"><button onClick={()=>onOpen(p)}>Explore case study <span><IconArrowUpRight/></span></button><a href={p.links[0].url} target="_blank" rel="noreferrer" aria-label={'View '+p.title+' source'}>Source <IconArrowUpRight/></a></div></div>
+ </article>)}</div></div><div className="gallery-footer"><span>SCROLL TO EXPLORE <span aria-hidden="true"><IconArrowDown/></span></span><div className="progress-line"><span ref={progress}/></div><span>0{active+1} <span className="counter-divider">/</span> 05</span></div>
  </div></section>;
 }

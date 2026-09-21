@@ -52,3 +52,5 @@
 #intro .entrance-scene{pointer-events:none}
 @media(min-width:700px){#intro .entrance-scene{top:auto;bottom:4px;left:42%;translate:-50% 0;height:95%;width:auto;aspect-ratio:16/9}}
 @media(min-width:700px) and (max-height:820px){.role-directory .role-item{padding:15px 20px 15px 0}.role-directory .role-item+.role-item{padding-left:22px}}
+.icon-arrow{display:inline-block;vertical-align:-2px;margin-left:6px;flex-shrink:0}
+.experience-location .icon-arrow{margin-left:0;margin-right:4px}
