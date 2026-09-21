@@ -5,7 +5,7 @@ import { EntranceScene } from './EntranceScene';
 
 export type CharacterAssets = { entrance:string; mobile:string; foldedPoster:string; mobilePoster:string };
 
-export function Character({ assets, motion=true, ready=true }: { assets?:CharacterAssets; motion?:boolean;ready?:boolean }) {
+export function Character({ assets, motion=true, ready=true, onSound }: { assets?:CharacterAssets; motion?:boolean;ready?:boolean; onSound?:(s:{muted:boolean;toggle:()=>void;disabled:boolean})=>void }) {
   const video=useRef<HTMLVideoElement>(null);
   const autoStarted=useRef(false),preferredMuted=useRef(false),userPaused=useRef(false);
   const clock=useRef({reveal:motion?0:1,light:motion?.2:1});
@@ -88,6 +88,30 @@ export function Character({ assets, motion=true, ready=true }: { assets?:Charact
     preferredMuted.current=!element.muted;element.muted=preferredMuted.current;setMuted(element.muted);
     if(element.paused&&!ended)void element.play().catch(()=>{});
   };
+
+  // Expose the sound state + toggle so the hero can render an always-visible
+  // "Sound on / Mute" control above the fold.
+  useEffect(()=>{onSound?.({muted,toggle:toggleSound,disabled:!assets||failed});
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  },[muted,failed,assets,onSound]);
+
+  // Autoplay policy blocks audio until a user gesture. If the browser forced the
+  // intro to start muted but the visitor has not chosen to mute, unmute + play on
+  // the very first interaction anywhere on the page (click / tap / key).
+  useEffect(()=>{
+    if(!motion)return;
+    const unlock=()=>{
+      const element=video.current;
+      if(element&&!preferredMuted.current&&element.muted){
+        element.muted=false;setMuted(false);
+        if(element.paused&&!ended)void element.play().catch(()=>{});
+      }
+      remove();
+    };
+    const remove=()=>{['pointerdown','touchstart','keydown'].forEach(e=>window.removeEventListener(e,unlock));};
+    ['pointerdown','touchstart','keydown'].forEach(e=>window.addEventListener(e,unlock,{once:true,passive:true}));
+    return remove;
+  },[motion,ended]);
 
   return <div className="character-area studio-character">
     <div className="portrait-frame">

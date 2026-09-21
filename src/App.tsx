@@ -11,11 +11,14 @@ import { Work } from './components/Work';
 import { Contact } from './components/Contact';
 import { CaseStudy } from './components/CaseStudy';
 import { projects, type Project } from './data';
+import { useSmoothScroll } from './useSmoothScroll';
 function savedMotion(){try{return localStorage.getItem('kiran-motion')!=='off';}catch{return true;}}
 const characterAssets:CharacterAssets={entrance:'/assets/kiran-studio-desktop.mp4',mobile:'/assets/kiran-studio-mobile.mp4',foldedPoster:'/assets/kiran-studio-poster.jpg',mobilePoster:'/assets/kiran-studio-poster-mobile.jpg'};
 const heroRoles=['AI Developer','Generative AI Developer','Computer Vision Engineer','Backend & Cloud Developer'];
 export default function App(){
  const [reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches),[enabled,setEnabled]=useState(savedMotion),[project,setProject]=useState<Project|null>(null); const hero=useRef<HTMLElement>(null);const motion=enabled&&!reduced;const bypass=!motion||Boolean(location.hash&&location.hash!=='#intro');const [ready,setReady]=useState(()=>bypass),[loading,setLoading]=useState(()=>!bypass);const beginOpening=useCallback(()=>setReady(true),[]),completeLoading=useCallback(()=>setLoading(false),[]);
+ const [heroSound,setHeroSound]=useState<{muted:boolean;toggle:()=>void;disabled:boolean}|null>(null);
+ useSmoothScroll(motion&&ready);
  useEffect(()=>{const query=matchMedia('(prefers-reduced-motion: reduce)');const listener=()=>setReduced(query.matches);query.addEventListener('change',listener);return()=>query.removeEventListener('change',listener);},[]);
  useEffect(()=>{document.documentElement.dataset.motion=motion?'on':'off';try{localStorage.setItem('kiran-motion',enabled?'on':'off');}catch{/* Storage may be disabled. */}},[enabled,motion]);
  useLayoutEffect(()=>{
@@ -35,8 +38,8 @@ export default function App(){
  <main id="main" inert={!ready}><section id="intro" ref={hero} className="hero cinematic-hero" data-ready={ready}>
  <div className="hero-content"><div className="hero-copy"><p className="eyebrow"><span className="status-dot"/> KIRAN KISHORE VENKATESAN</p>
  <h1 aria-label="Hi, I’m Kiran Kishore"><span className="intro-greeting">Hi, I’m</span><span className="intro-name">{['KIRAN','KISHORE'].map((name,line)=><span className="name-line" data-text={name} aria-hidden="true" key={name}>{[...name].map((c,i)=><span className="name-letter" data-letter={c} style={{'--letter':line*7+i} as CSSProperties} key={i}>{c}</span>)}<span className="name-glint" aria-hidden="true">{name}</span></span>)}<span className="name-scan" aria-hidden="true"/></span></h1>
- <p className="hero-description"><span>Turning complex problems</span><br/><strong>into working software.</strong><i aria-hidden="true"/></p><div className="hero-actions"><a className="primary-button" href="#work">View Work <span>↗</span></a><a className="resume-link" href="/assets/kiran-resume.pdf" download>Download Resume <span>↓</span></a></div></div>
- <div className="hero-stage"><p className="stage-caption">PORTFOLIO / 2026</p><Character motion={motion} assets={characterAssets} ready={ready}/></div></div>
+ <p className="hero-description"><span>Turning complex problems</span><br/><strong>into working software.</strong><i aria-hidden="true"/></p><div className="hero-actions"><a className="primary-button" href="#work">View Work <span>↗</span></a><a className="resume-link" href="/assets/kiran-resume.pdf" download>Download Resume <span>↓</span></a>{heroSound&&<button className="resume-link hero-sound" onClick={heroSound.toggle} disabled={heroSound.disabled} aria-pressed={!heroSound.muted} aria-label={heroSound.muted?'Turn introduction sound on':'Mute introduction'}><svg className="hero-sound-icon" viewBox="0 0 24 24" width="15" height="15" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"><path d="M4 9.5v5h3.5L12 18V6L7.5 9.5H4z"/>{heroSound.muted?<path d="M16.5 9.5l4 5m0-5l-4 5"/>:<><path d="M15.5 9a4 4 0 0 1 0 6"/><path d="M18 6.8a7 7 0 0 1 0 10.4"/></>}</svg><span>{heroSound.muted?'Sound on':'Mute'}</span></button>}</div></div>
+ <div className="hero-stage"><p className="stage-caption">PORTFOLIO / 2026</p><Character motion={motion} assets={characterAssets} ready={ready} onSound={setHeroSound}/></div></div>
  <div className="hero-role role-directory" aria-label="Professional focus">{heroRoles.map((role,index)=><p className="role-item" style={{'--role-index':index} as CSSProperties} key={role}><span className="role-number" aria-hidden="true">0{index+1}</span><span className="role-name">{role}</span></p>)}</div>
  <div className="hero-bottom"><span>BASED IN <b>COIMBATORE, INDIA</b></span><a href="#journey">Explore experience <span>↓</span></a></div></section>
  <Journey motion={motion}/>
