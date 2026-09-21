@@ -11,11 +11,13 @@ import { Work } from './components/Work';
 import { Contact } from './components/Contact';
 import { CaseStudy } from './components/CaseStudy';
 import { projects, type Project } from './data';
+import { useSmoothScroll } from './useSmoothScroll';
 function savedMotion(){try{return localStorage.getItem('kiran-motion')!=='off';}catch{return true;}}
 const characterAssets:CharacterAssets={entrance:'/assets/kiran-studio-desktop.mp4',mobile:'/assets/kiran-studio-mobile.mp4',foldedPoster:'/assets/kiran-studio-poster.jpg',mobilePoster:'/assets/kiran-studio-poster-mobile.jpg'};
 const heroRoles=['AI Developer','Generative AI Developer','Computer Vision Engineer','Backend & Cloud Developer'];
 export default function App(){
  const [reduced,setReduced]=useState(()=>matchMedia('(prefers-reduced-motion: reduce)').matches),[enabled,setEnabled]=useState(savedMotion),[project,setProject]=useState<Project|null>(null); const hero=useRef<HTMLElement>(null);const motion=enabled&&!reduced;const bypass=!motion||Boolean(location.hash&&location.hash!=='#intro');const [ready,setReady]=useState(()=>bypass),[loading,setLoading]=useState(()=>!bypass);const beginOpening=useCallback(()=>setReady(true),[]),completeLoading=useCallback(()=>setLoading(false),[]);
+ useSmoothScroll(motion&&ready);
  useEffect(()=>{const query=matchMedia('(prefers-reduced-motion: reduce)');const listener=()=>setReduced(query.matches);query.addEventListener('change',listener);return()=>query.removeEventListener('change',listener);},[]);
  useEffect(()=>{document.documentElement.dataset.motion=motion?'on':'off';try{localStorage.setItem('kiran-motion',enabled?'on':'off');}catch{/* Storage may be disabled. */}},[enabled,motion]);
  useLayoutEffect(()=>{
