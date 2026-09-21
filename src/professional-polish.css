@@ -202,3 +202,20 @@
 [data-motion=off] .role-window::after,[data-motion=off] .role-item{animation:none!important}
 [data-motion=off] .role-item{opacity:0;transform:none}
 [data-motion=off] .role-item:first-child{opacity:1}
+
+/* Always-visible intro sound control in the hero action row. */
+.hero-actions button.hero-sound{
+  display:inline-flex;align-items:center;gap:8px;
+  background:transparent;color:#d6dbe2;font:inherit;font-size:13px;
+  padding:11px 16px;min-height:44px;border-radius:999px;cursor:pointer;
+  border:1px solid color-mix(in srgb, var(--accent, #ff5838) 65%, transparent);
+  transition:border-color .25s ease, color .25s ease, background .25s ease;
+}
+.hero-actions button.hero-sound:hover{
+  border-color:var(--accent, #ff5838);color:#fff;
+  background:color-mix(in srgb, var(--accent, #ff5838) 12%, transparent);
+}
+.hero-actions button.hero-sound[aria-pressed="true"]{
+  border-color:color-mix(in srgb, var(--accent, #ff5838) 40%, transparent);
+}
+.hero-actions button.hero-sound:disabled{opacity:.45;cursor:default;}
