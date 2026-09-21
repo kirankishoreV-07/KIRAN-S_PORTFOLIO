@@ -83,10 +83,21 @@ export function Character({ assets, motion=true, ready=true, onSound }: { assets
     const element=video.current;if(!element)return;
     userPaused.current=true;element.pause();
   };
+  // Turn the introduction sound on, audibly. This runs from a real user gesture,
+  // so the browser permits sound. The clip is short and often already finished by
+  // the time the visitor clicks, so restart it from the beginning — otherwise
+  // unmuting an ended clip would play nothing.
+  const enableSound=()=>{
+    const element=video.current;if(!element)return;
+    preferredMuted.current=false;userPaused.current=false;
+    element.muted=false;setMuted(false);
+    element.currentTime=0;setEnded(false);
+    void element.play().catch(()=>{});
+  };
   const toggleSound=()=>{
     const element=video.current;if(!element)return;
-    preferredMuted.current=!element.muted;element.muted=preferredMuted.current;setMuted(element.muted);
-    if(element.paused&&!ended)void element.play().catch(()=>{});
+    if(element.muted){enableSound();}
+    else{preferredMuted.current=true;element.muted=true;setMuted(true);}
   };
 
   // Expose the sound state + toggle so the hero can render an always-visible
@@ -96,22 +107,25 @@ export function Character({ assets, motion=true, ready=true, onSound }: { assets
   },[muted,failed,assets,onSound]);
 
   // Autoplay policy blocks audio until a user gesture. If the browser forced the
-  // intro to start muted but the visitor has not chosen to mute, unmute + play on
-  // the very first interaction anywhere on the page (click / tap / key).
+  // intro to start muted but the visitor has not chosen to mute, unmute + play it
+  // from the start on the first interaction anywhere on the page (click/tap/key).
+  // Events that originate from the sound control itself are ignored so this does
+  // not fight the button's own toggle (which would leave it muted).
   useEffect(()=>{
     if(!motion)return;
-    const unlock=()=>{
+    const unlock=(event:Event)=>{
+      const target=event.target as HTMLElement|null;
+      if(target?.closest?.('.hero-sound,.intro-controls')){remove();return;}
       const element=video.current;
-      if(element&&!preferredMuted.current&&element.muted){
-        element.muted=false;setMuted(false);
-        if(element.paused&&!ended)void element.play().catch(()=>{});
-      }
+      const host=element?.closest<HTMLElement>('#intro');
+      const inView=host?(host.getBoundingClientRect().bottom>0&&host.getBoundingClientRect().top<innerHeight):true;
+      if(element&&inView&&!preferredMuted.current&&element.muted)enableSound();
       remove();
     };
     const remove=()=>{['pointerdown','touchstart','keydown'].forEach(e=>window.removeEventListener(e,unlock));};
-    ['pointerdown','touchstart','keydown'].forEach(e=>window.addEventListener(e,unlock,{once:true,passive:true}));
+    ['pointerdown','touchstart','keydown'].forEach(e=>window.addEventListener(e,unlock,{passive:true}));
     return remove;
-  },[motion,ended]);
+  },[motion]);
 
   return <div className="character-area studio-character">
     <div className="portrait-frame">
