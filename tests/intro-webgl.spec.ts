@@ -1,13 +1,13 @@
 import {test,expect} from '@playwright/test';
-import {enterPortfolio} from './helpers';
+import {enterPortfolio,subjectExtent} from './helpers';
 test('WebGL renders above CSS resolution within a 4K cap and keeps the full frame',async({page})=>{
  await page.setViewportSize({width:390,height:844});await enterPortfolio(page);await expect(page.locator('#intro')).toHaveAttribute('data-webgl','ready');
  await expect(page.getByRole('heading',{level:1})).toHaveAccessibleName('Hi, I’m Kiran Kishore');
  const sizes=await page.locator('.webgl-studio').evaluate((c:HTMLCanvasElement)=>({buffer:c.width,bufferHeight:c.height,css:c.getBoundingClientRect().width}));
  expect(sizes.buffer).toBeGreaterThan(sizes.css);expect(sizes.buffer).toBeLessThanOrEqual(3840);expect(sizes.bufferHeight).toBeLessThanOrEqual(2160);
- const video=page.locator('.entrance-figure');const frame=await video.boundingBox();expect(frame!.width/frame!.height).toBeCloseTo(16/9,2);expect(frame!.x).toBeGreaterThanOrEqual(-1);expect(frame!.x+frame!.width).toBeLessThanOrEqual(391);
- await expect(page.locator('.hero-role')).toContainText('Backend & Cloud Developer');
- await expect(page.locator('.role-item')).toHaveCount(4);
+ const subject=await subjectExtent(page);expect(subject.ratio).toBeCloseTo(16/9,2);expect(subject.left).toBeGreaterThanOrEqual(0);expect(subject.right).toBeLessThanOrEqual(390);
+ await expect(page.locator('.hero-roles')).toContainText('Backend & Cloud Developer');
+ await expect(page.locator('.hero-roles li')).toHaveCount(4);
 });
 test('WebGL creation failure keeps the original playable HTML film',async({page})=>{
  await page.addInitScript(()=>{const original=HTMLCanvasElement.prototype.getContext;HTMLCanvasElement.prototype.getContext=function(type:string,...args:unknown[]){if(type==='webgl'||type==='webgl2')return null;return Reflect.apply(original,this,[type,...args]);} as typeof original;});

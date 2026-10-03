@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+import { gsap } from '../motion/gsap';
 import {useCharacterMedia} from './characterMedia';
 import { EntranceScene } from './EntranceScene';
+import { IconPause, IconPlay, IconReplay, IconSound } from './icons';
 
 export type CharacterAssets = { entrance:string; mobile:string; foldedPoster:string; mobilePoster:string };
 
-export function Character({ assets, motion=true, ready=true, onSound }: { assets?:CharacterAssets; motion?:boolean;ready?:boolean; onSound?:(s:{muted:boolean;toggle:()=>void;disabled:boolean})=>void }) {
+export function Character({ assets, motion=true, ready=true }: { assets?:CharacterAssets; motion?:boolean; ready?:boolean }) {
   const video=useRef<HTMLVideoElement>(null);
   const autoStarted=useRef(false),preferredMuted=useRef(false),userPaused=useRef(false);
   const clock=useRef({reveal:motion?0:1,light:motion?.2:1});
@@ -46,18 +47,15 @@ export function Character({ assets, motion=true, ready=true, onSound }: { assets
     if(motion&&!autoStarted.current){
       context.add(()=>{
         clock.current.reveal=0;clock.current.light=.2;
+        // The hero copy is choreographed by <Hero>; this timeline only brings
+        // the light up and cues the walk-in so the figure arrives as the
+        // title settles.
         opening=gsap.timeline({paused:true})
           .call(()=>{if(host)host.dataset.opening='title';},[],0)
-          .fromTo('.intro-greeting',{y:10,opacity:0},{y:0,opacity:1,duration:.5,ease:'power2.out'},.08)
-          .fromTo('.name-letter',{yPercent:112,rotateX:-72,rotateY:-8,scale:.94,opacity:0,filter:'blur(9px)',transformOrigin:'50% 100%'},{yPercent:0,rotateX:0,rotateY:0,scale:1,opacity:1,filter:'blur(0px)',duration:.9,stagger:{each:.032,from:'start'},ease:'power4.out'},.16)
-          .fromTo('.name-scan',{xPercent:-760,opacity:0},{xPercent:760,opacity:.85,duration:1.12,ease:'power2.inOut'},.28)
-          .to('.name-scan',{opacity:0,duration:.22,ease:'power1.out'},1.2)
-          .fromTo('.hero-role',{y:18,opacity:0},{y:0,opacity:1,duration:.7,stagger:.1,ease:'power3.out'},.74)
-          .fromTo('.hero-actions, .hero-description, .hero-bottom',{y:14,opacity:0},{y:0,opacity:1,duration:.66,stagger:.08,ease:'power2.out'},.92)
-          .to(clock.current,{reveal:1,light:1,duration:1.05,ease:'power2.out'},.92)
-          .fromTo('.intro-controls',{y:8,opacity:0},{y:0,opacity:1,duration:.5,ease:'power2.out'},1.3)
-          .call(()=>{cue=true;start(true);if(host)host.dataset.opening='film';},[],1.12)
-          .call(()=>{if(host)host.dataset.opening='settled';},[],2.35);
+          .to(clock.current,{reveal:1,light:1,duration:1.25,ease:'power2.out'},.8)
+          .fromTo('.intro-controls',{y:10,autoAlpha:0},{y:0,autoAlpha:1,duration:.8,ease:'cine'},1.55)
+          .call(()=>{cue=true;start(true);if(host)host.dataset.opening='film';},[],.9)
+          .call(()=>{if(host)host.dataset.opening='settled';},[],2.4);
       });
     }else{cue=true;clock.current.reveal=1;clock.current.light=1;if(host)host.dataset.opening='settled';}
     const observer=new IntersectionObserver(([entry])=>{
@@ -100,12 +98,6 @@ export function Character({ assets, motion=true, ready=true, onSound }: { assets
     else{preferredMuted.current=true;element.muted=true;setMuted(true);}
   };
 
-  // Expose the sound state + toggle so the hero can render an always-visible
-  // "Sound on / Mute" control above the fold.
-  useEffect(()=>{onSound?.({muted,toggle:toggleSound,disabled:!assets||failed});
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  },[muted,failed,assets,onSound]);
-
   // Autoplay policy blocks audio until a user gesture. If the browser forced the
   // intro to start muted but the visitor has not chosen to mute, unmute + play it
   // from the start on the first interaction anywhere on the page (click/tap/key).
@@ -138,9 +130,9 @@ export function Character({ assets, motion=true, ready=true, onSound }: { assets
       />:<div className="portrait-fallback">{photoFailed?<div className="portrait-missing">KIRAN<span>AI developer</span></div>:<img className="portrait" src="/assets/kiran-photo.jpeg" alt="Kiran Kishore Venkatesan, wearing glasses and a grey suit" width="685" height="820" onError={()=>setPhotoFailed(true)}/>}</div>}
     </div>
     <div className="intro-controls professional-media-controls" role="group" aria-label="Introduction controls">
-      <button className="play-button" disabled={!assets||failed} onClick={()=>playing?pause():play(ended)}><span aria-hidden="true">{playing?'Ⅱ':'▶'}</span> {playing?'Pause':ended?'Play again':'Play'}</button>
-      <button className="quiet-button replay-button" disabled={!assets||failed} onClick={()=>play(true)} aria-label="Replay introduction"><span aria-hidden="true">↺</span><span className="control-label">Replay</span></button>
-      <button className="quiet-button sound-button" disabled={!assets||failed} onClick={toggleSound} aria-pressed={!muted} aria-label={muted?'Turn sound on':'Mute sound'}><span aria-hidden="true">{muted?'♩':'♪'}</span><span className="control-label">{muted?'Sound on':'Mute'}</span></button>
+      <button className="film-button film-button--primary sound-button" disabled={!assets||failed} onClick={toggleSound} aria-pressed={!muted} aria-label={muted?'Turn sound on':'Mute sound'}><IconSound muted={muted}/><span className="control-label">{muted?'Sound on':'Mute'}</span></button>
+      <button className="film-button play-button" disabled={!assets||failed} onClick={()=>playing?pause():play(ended)}>{playing?<IconPause/>:<IconPlay/>}<span className="control-label">{playing?'Pause':ended?'Play again':'Play'}</span></button>
+      <button className="film-button replay-button" disabled={!assets||failed} onClick={()=>play(true)} aria-label="Replay introduction"><IconReplay/></button>
     </div>
     {status&&<p role="status" className="sr-only">{status}</p>}
   </div>;

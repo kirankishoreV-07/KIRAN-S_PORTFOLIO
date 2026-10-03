@@ -1,0 +1,39 @@
+/* The single, continuous set. Everything scrolls over this fixed layer and
+   only its lighting changes, so the page never cuts between sections. */
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-stage);
+  pointer-events: none;
+  background:
+    radial-gradient(62vmax 52vmax at var(--key-x) var(--key-y), var(--key), transparent 72%),
+    radial-gradient(52vmax 44vmax at var(--fill-x) var(--fill-y), var(--fill), transparent 72%),
+    var(--bg);
+}
+.stage::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(120% 90% at 50% 45%, transparent 55%, rgb(0 0 0 / var(--vignette)) 100%);
+}
+
+.grain {
+  position: fixed;
+  inset: -60%;
+  z-index: var(--z-hud);
+  pointer-events: none;
+  opacity: 0.055;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .5 0 0 0 0 .5 0 0 0 0 .5 0 0 0 1.2 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  will-change: transform;
+}
+:root[data-tone='light'] .grain { opacity: 0.08; }
+:root[data-motion='on'] .grain { animation: grain 0.9s steps(6) infinite; }
+@keyframes grain {
+  0% { transform: translate(0, 0); }
+  17% { transform: translate(-3%, 2%); }
+  33% { transform: translate(2%, -4%); }
+  50% { transform: translate(-4%, -1%); }
+  67% { transform: translate(3%, 3%); }
+  83% { transform: translate(-1%, 4%); }
+  100% { transform: translate(0, 0); }
+}

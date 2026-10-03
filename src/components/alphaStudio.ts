@@ -2,8 +2,6 @@ import * as THREE from 'three';
 import gsap from 'gsap';
 import type {AlphaMedia} from './characterMedia';
 const vertex=`varying vec2 vUv;void main(){vUv=uv;gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.);}`;
-const wall=`varying vec2 vUv;uniform float time;uniform float aspect;uniform float light;uniform float warm;
-void main(){vec2 ratio=vec2(aspect,1.);vec2 key=(vUv-vec2(.73+.012*sin(time*.11),.43+.01*cos(time*.14)))*ratio;vec2 fill=(vUv-vec2(.38+.01*cos(time*.09),.62))*ratio;float keyGlow=exp(-dot(key,key)*6.2);float fillGlow=exp(-dot(fill,fill)*7.4);vec2 beamUv=vUv-vec2(.76,.16);float beam=exp(-abs(beamUv.x+beamUv.y*.22)*24.)*smoothstep(.96,.2,beamUv.y)*.17;float horizon=exp(-pow((vUv.y-.86)*9.,2.));float vig=smoothstep(.26,1.,length((vUv-.5)*vec2(aspect*.62,1.)));float grain=fract(sin(dot(gl_FragCoord.xy+floor(time*10.),vec2(12.9898,78.233)))*43758.5453)-.5;vec3 base=mix(vec3(.021,.029,.044),vec3(.027,.026,.029),warm);vec3 cool=vec3(.075,.12,.15)*(keyGlow+beam)*light;vec3 amber=vec3(.15,.063,.028)*(fillGlow*.52+horizon*.2)*light;vec3 col=base+mix(cool,amber,warm*.58)+mix(amber,cool,warm*.25);gl_FragColor=vec4(col*(1.-vig*.34)+grain*.003,1.);}`;
 // One synchronized decoder: premultiplied RGB left, coverage right. Sampling
 // stays a texel inside each half so filtering never pulls alpha into colour.
 const film=`varying vec2 vUv;uniform sampler2D media;uniform vec2 texel;uniform float reveal;uniform vec4 subject;
@@ -37,10 +35,11 @@ void main(){vec2 cuv=vec2(vUv.x*.5,vUv.y);
 const floorShader=`varying vec2 vUv;uniform float time;uniform float light;uniform float warm;
 void main(){vec2 p=(vUv-vec2(.5,.44))*vec2(2.15,1.);float pool=exp(-dot(p,p)*7.2);float ring=exp(-pow(length(p)-.32,2.)*34.)*.13;float edge=smoothstep(0.,.15,vUv.x)*smoothstep(0.,.15,1.-vUv.x)*smoothstep(0.,.12,vUv.y)*smoothstep(0.,.12,1.-vUv.y);vec3 col=mix(vec3(.11,.16,.19),vec3(.19,.105,.073),warm)*(1.+sin(time*.16)*.035);gl_FragColor=vec4(col,(pool+ring)*edge*light*.34);}`;
 const auraShader=`varying vec2 vUv;uniform vec4 subject;uniform float time;uniform float light;
-void main(){vec2 center=vec2((subject.x+subject.z)*.5,1.-(subject.y+subject.w)*.5);vec2 radius=vec2(max(.12,(subject.z-subject.x)*.9),max(.24,(subject.w-subject.y)*.62));vec2 p=(vUv-center)/radius;float core=exp(-dot(p,p)*2.15);float warm=exp(-dot(p-vec2(.72,.02),p-vec2(.72,.02))*3.8);float cool=exp(-dot(p+vec2(.7,-.06),p+vec2(.7,-.06))*3.4);float pulse=.97+.03*sin(time*.2);vec3 col=vec3(.045,.092,.115)*cool+vec3(.17,.067,.029)*warm+vec3(.038,.047,.058)*core;float edge=smoothstep(1.,.75,abs(vUv.x-.5)*2.);gl_FragColor=vec4(col,(core*.18+warm*.14+cool*.13)*edge*light*pulse);}`;
+void main(){vec2 center=vec2((subject.x+subject.z)*.5,1.-(subject.y+subject.w)*.5);vec2 radius=vec2(max(.12,(subject.z-subject.x)*.9),max(.24,(subject.w-subject.y)*.62));vec2 p=(vUv-center)/radius;float core=exp(-dot(p,p)*2.15);float warm=exp(-dot(p-vec2(.72,.02),p-vec2(.72,.02))*3.8);float cool=exp(-dot(p+vec2(.7,-.06),p+vec2(.7,-.06))*3.4);float pulse=.97+.03*sin(time*.2);vec3 col=vec3(.045,.092,.115)*cool+vec3(.17,.067,.029)*warm+vec3(.038,.047,.058)*core;float edge=smoothstep(1.,.75,abs(vUv.x-.5)*2.)*smoothstep(0.,.16,vUv.y)*smoothstep(0.,.1,1.-vUv.y);gl_FragColor=vec4(col,(core*.18+warm*.14+cool*.13)*edge*light*pulse);}`;
 const shadowShader=`varying vec2 vUv;uniform vec4 subject;uniform float reveal;
 void main(){float w=max(.045,(subject.z-subject.x)*.55);vec2 feet=vec2((subject.x+subject.z)*.5,1.-subject.w+.001);vec2 p=(vUv-feet)/vec2(w,.015);float a=exp(-dot(p,p)*2.2)*.24*reveal;gl_FragColor=vec4(.006,.008,.012,a);}`;
-/** The approved studio environment, with a genuinely transparent video body.
+/** A transparent studio: the page's fixed stage provides the wall and
+ * lighting, this canvas adds only the aura, floor pool and the matted body.
  * The screen-aligned performance is unchanged; only the floor/shadow follows
  * measured feet. The person is video media, not a replacement rigged avatar. */
 export function createAlphaStudio(host:HTMLElement,frame:HTMLElement,video:HTMLVideoElement,media:AlphaMedia,clock:{reveal:number;light:number},motion:boolean,tie=false){
@@ -49,11 +48,9 @@ export function createAlphaStudio(host:HTMLElement,frame:HTMLElement,video:HTMLV
  let renderer:THREE.WebGLRenderer;
  try{renderer=new THREE.WebGLRenderer({canvas,alpha:true,antialias:false,powerPreference:'high-performance'});}catch{canvas.remove();native();return()=>{};}
  renderer.outputColorSpace=THREE.LinearSRGBColorSpace;renderer.autoClear=false;
- const screen=new THREE.Scene(),auraScene=new THREE.Scene(),room=new THREE.Scene(),filmScene=new THREE.Scene();
+ const auraScene=new THREE.Scene(),room=new THREE.Scene(),filmScene=new THREE.Scene();
  const ortho=new THREE.OrthographicCamera(-1,1,1,-1,.1,10);ortho.position.z=2;
  const camera=new THREE.PerspectiveCamera(tie?32:38,16/9,.1,40);camera.position.set(0,tie?2.1:2.4,tie?6.4:7);
- const bgMat=new THREE.ShaderMaterial({vertexShader:vertex,fragmentShader:wall,depthTest:false,depthWrite:false,uniforms:{time:{value:0},light:{value:1},aspect:{value:1},warm:{value:tie?1:0}}});
- const bg=new THREE.Mesh(new THREE.PlaneGeometry(2,2),bgMat);screen.add(bg);
  const texture=new THREE.VideoTexture(video);texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;texture.generateMipmaps=false;
  const poster=new THREE.TextureLoader().load(media.texturePoster,()=>draw(),undefined,()=>fail());poster.minFilter=THREE.LinearFilter;poster.generateMipmaps=false;
  const subject=new THREE.Vector4();
@@ -74,7 +71,7 @@ export function createAlphaStudio(host:HTMLElement,frame:HTMLElement,video:HTMLV
  let alive=true,lost=false,visible=true,running=false,width=1,height=1,elapsed=0,lastTick=0,debt=0,frames=0;
  function fail(){if(!alive||lost)return;lost=true;canvas.style.display='none';gsap.ticker.remove(tick);running=false;native();}
  renderer.debug.onShaderError=fail;
- const layout=()=>{const b=host.getBoundingClientRect();width=Math.max(1,b.width);height=Math.max(1,b.height);const desired=Math.max(small()?1.25:1.5,Math.min(devicePixelRatio||1,small()?1.5:2));const fourKCap=Math.min(3840/width,2160/height);renderer.setPixelRatio(Math.max(1,Math.min(desired,fourKCap)));renderer.setSize(width,height,false);bgMat.uniforms.aspect.value=width/height;host.dataset.mediaResolution=`${media.width}x${media.height}`;host.dataset.renderQuality='adaptive-4k-buffer';};
+ const layout=()=>{const b=host.getBoundingClientRect();width=Math.max(1,b.width);height=Math.max(1,b.height);const desired=Math.max(small()?1.25:1.5,Math.min(devicePixelRatio||1,small()?1.5:2));const fourKCap=Math.min(3840/width,2160/height);renderer.setPixelRatio(Math.max(1,Math.min(desired,fourKCap)));renderer.setSize(width,height,false);host.dataset.mediaResolution=`${media.width}x${media.height}`;host.dataset.renderQuality='adaptive-4k-buffer';};
  function draw(){
   if(!alive||lost)return;
   const b=host.getBoundingClientRect(),f=frame.getBoundingClientRect(),x=f.left-b.left,y=height-(f.top-b.top)-f.height;
@@ -82,13 +79,13 @@ export function createAlphaStudio(host:HTMLElement,frame:HTMLElement,video:HTMLV
   filmMat.uniforms.media.value=hasFrame?texture:poster;
   const box=media.boxes[hasFrame?Math.min(media.boxes.length-1,Math.floor(video.currentTime*media.fps)):media.boxes.length-1];
   subject.set(box[0],box[1],box[2],box[3]);filmMat.uniforms.reveal.value=clock.reveal;shadowMat.uniforms.reveal.value=clock.reveal;
-  bgMat.uniforms.light.value=clock.light;floorMat.uniforms.light.value=clock.light;auraMat.uniforms.light.value=clock.light;bgMat.uniforms.time.value=elapsed;floorMat.uniforms.time.value=elapsed;auraMat.uniforms.time.value=elapsed;
+  floorMat.uniforms.light.value=clock.light;auraMat.uniforms.light.value=clock.light;floorMat.uniforms.time.value=elapsed;auraMat.uniforms.time.value=elapsed;
   const scroll=motion&&!tie?Math.min(.12,Math.max(0,-b.top/height)*.12):0;pointer.lerp(target,.035);
   camera.position.set(!tie&&motion?pointer.x*.06:0,(tie?2.1:2.4)+(!tie&&motion?pointer.y*.025:0),(tie?6.4:7)-scroll-(tie?Math.min(.55,video.currentTime/9.6*.55):0));camera.lookAt(0,tie?.3:.4,0);camera.aspect=f.width/f.height;camera.updateProjectionMatrix();camera.updateMatrixWorld();
   ray.setFromCamera(new THREE.Vector2(box[0]+box[2]-1,1-2*box[3]),camera);
   if(ray.ray.intersectPlane(ground,anchor)){floor.position.x=anchor.x;floor.position.z=anchor.z-.54;}
   particles.position.y=motion?Math.sin(elapsed*.12)*.035:0;
-  try{renderer.setScissorTest(false);renderer.setViewport(0,0,width,height);renderer.clear();if(!tie)renderer.render(screen,ortho);renderer.setViewport(x,y,f.width,f.height);renderer.setScissor(x,y,f.width,f.height);renderer.setScissorTest(true);renderer.render(auraScene,ortho);renderer.render(room,camera);renderer.clearDepth();renderer.render(filmScene,ortho);renderer.setScissorTest(false);if(!lost){host.dataset.webgl='ready';host.dataset.character='alpha';host.dataset.frames=String(++frames);}}
+  try{renderer.setScissorTest(false);renderer.setViewport(0,0,width,height);renderer.clear();renderer.setViewport(x,y,f.width,f.height);renderer.setScissor(x,y,f.width,f.height);renderer.setScissorTest(true);renderer.render(auraScene,ortho);renderer.render(room,camera);renderer.clearDepth();renderer.render(filmScene,ortho);renderer.setScissorTest(false);if(!lost){host.dataset.webgl='ready';host.dataset.character='alpha';host.dataset.frames=String(++frames);}}
   catch{fail();}
  }
  function tick(time:number){if(!lastTick)lastTick=time;const d=Math.min(.05,time-lastTick);elapsed+=d;debt+=d;lastTick=time;if(debt>=1/(small()?24:30)){debt%=1/(small()?24:30);draw();}}
@@ -102,5 +99,5 @@ export function createAlphaStudio(host:HTMLElement,frame:HTMLElement,video:HTMLV
  if('requestVideoFrameCallback' in video)presentedCallback=video.requestVideoFrameCallback(presented);
  const events=['play','pause','ended','loadeddata','seeked'] as const;events.forEach(e=>video.addEventListener(e,sync));document.addEventListener('visibilitychange',sync);host.addEventListener('pointermove',move);host.addEventListener('pointerleave',leave);
  layout();sync();
- return()=>{alive=false;if(presentedCallback)video.cancelVideoFrameCallback(presentedCallback);gsap.ticker.remove(tick);resize.disconnect();observer.disconnect();events.forEach(e=>video.removeEventListener(e,sync));document.removeEventListener('visibilitychange',sync);host.removeEventListener('pointermove',move);host.removeEventListener('pointerleave',leave);canvas.removeEventListener('webglcontextlost',contextLost);[bg.geometry,aura.geometry,plate.geometry,shadow.geometry,floor.geometry,particlesGeo].forEach(g=>g.dispose());[bgMat,auraMat,filmMat,shadowMat,floorMat,particlesMat].forEach(m=>m.dispose());texture.dispose();poster.dispose();renderer.dispose();renderer.forceContextLoss();canvas.remove();delete host.dataset.webgl;delete host.dataset.rendering;delete host.dataset.frames;delete host.dataset.character;delete host.dataset.mediaResolution;delete host.dataset.renderQuality;};
+ return()=>{alive=false;if(presentedCallback)video.cancelVideoFrameCallback(presentedCallback);gsap.ticker.remove(tick);resize.disconnect();observer.disconnect();events.forEach(e=>video.removeEventListener(e,sync));document.removeEventListener('visibilitychange',sync);host.removeEventListener('pointermove',move);host.removeEventListener('pointerleave',leave);canvas.removeEventListener('webglcontextlost',contextLost);[aura.geometry,plate.geometry,shadow.geometry,floor.geometry,particlesGeo].forEach(g=>g.dispose());[auraMat,filmMat,shadowMat,floorMat,particlesMat].forEach(m=>m.dispose());texture.dispose();poster.dispose();renderer.dispose();renderer.forceContextLoss();canvas.remove();delete host.dataset.webgl;delete host.dataset.rendering;delete host.dataset.frames;delete host.dataset.character;delete host.dataset.mediaResolution;delete host.dataset.renderQuality;};
 }

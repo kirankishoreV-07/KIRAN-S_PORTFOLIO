@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+import { gsap } from '../motion/gsap';
 import {useCharacterMedia} from './characterMedia';
 import { TieScene } from './TieScene';
+import { IconPause, IconPlay, IconReplay, IconSound } from './icons';
 
 export type TieAssets = { desktop:string; mobile:string; poster:string; mobilePoster:string };
 
@@ -52,7 +53,9 @@ export function TieAdjust({ assets, motion=true }: { assets?:TieAssets; motion?:
       if(entering)start(true);
       else if(!inView){pendingRestart=true;if(!element.paused)element.pause();}
     },{threshold:.35});
-    observer.observe(element);
+    // The 16:9 plate is far wider than a phone screen, so watch the visible
+    // host rather than the video element itself.
+    observer.observe(element.closest('#tie-adjust')??element);
     const hidden=()=>{if(document.hidden){if(!element.paused)element.pause();}else start();};
     document.addEventListener('visibilitychange',hidden);
     return()=>{tween?.kill();observer.disconnect();document.removeEventListener('visibilitychange',hidden);};
@@ -61,6 +64,12 @@ export function TieAdjust({ assets, motion=true }: { assets?:TieAssets; motion?:
     const element=video.current;if(!element||failed)return;
     hasPlayed.current=true;element.currentTime=0;setSettled(false);element.muted=preferredMuted.current;setMuted(element.muted);
     void element.play().catch(()=>{});
+  };
+  const togglePlay=()=>{
+    const element=video.current;if(!element||failed)return;
+    if(!element.paused){element.pause();return;}
+    if(element.ended){replay();return;}
+    hasPlayed.current=true;clock.current.reveal=1;void element.play().catch(()=>{});
   };
   const toggleSound=()=>{
     const element=video.current;if(!element)return;
@@ -75,11 +84,12 @@ export function TieAdjust({ assets, motion=true }: { assets?:TieAssets; motion?:
         onPause={()=>setPlaying(false)}
         onEnded={()=>{setPlaying(false);setSettled(true);}}
         onError={()=>{if(!media.fallback())setFailed(true);}}
-      />:assets?<img className="tie-poster-fallback" src={small?assets.mobilePoster:assets.poster} alt="Kiran’s final composed pose from the tie-adjust film"/>:null}
+      />:assets?<img className="tie-poster-fallback" src={small?assets.mobilePoster:assets.poster} width="1920" height="1080" alt="Kiran’s final composed pose from the tie-adjust film"/>:null}
     </div>
     <div className="intro-controls tie-controls" role="group" aria-label="Tie-adjust film controls">
-      <button className="quiet-button" disabled={!assets||failed} onClick={replay} aria-label="Replay tie adjustment"><span aria-hidden="true">↺ </span>{playing?'Playing':'Replay movement'}</button>
-      <button className="quiet-button sound-button" disabled={!assets||failed} onClick={toggleSound} aria-pressed={!muted} aria-label={muted?'Turn tie film sound on':'Mute tie film'}><span aria-hidden="true">{muted?'♩':'♪'}</span>{muted?' Sound on':' Mute'}</button>
+      <button className="film-button" disabled={!assets||failed} onClick={togglePlay} aria-label={playing?'Pause tie film':'Play tie film'}>{playing?<IconPause/>:<IconPlay/>}<span className="control-label">{playing?'Pause':'Play'}</span></button>
+      <button className="film-button replay-button" disabled={!assets||failed} onClick={replay} aria-label="Replay tie adjustment"><IconReplay/></button>
+      <button className="film-button sound-button" disabled={!assets||failed} onClick={toggleSound} aria-pressed={!muted} aria-label={muted?'Turn tie film sound on':'Mute tie film'}><IconSound muted={muted}/><span className="control-label">{muted?'Sound on':'Mute'}</span></button>
     </div>
   </div>;
 }

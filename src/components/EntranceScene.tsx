@@ -1,4 +1,3 @@
-import '../character-alpha.css';
 import {useEffect,useRef,type RefObject} from 'react';
 import type {AlphaMedia} from './characterMedia';
 import type {IntroClock} from './studio';

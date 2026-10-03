@@ -10,17 +10,23 @@ Vite, with two real-time WebGL film sequences driven by matte-extracted video.
 
 ## Highlights
 
-- **Two cinematic character films** rendered in WebGL. A walk-in introduction in
-  the hero and a tie-adjust sequence in the experience section, both composited
-  from alpha-matted video against a real-time studio environment (lighting,
-  floor, particles) rather than a flat video element.
-- **Scroll choreography** with GSAP ScrollTrigger: a pinned education timeline,
-  a bounded horizontal project gallery, and staggered section reveals.
-- **Accessible by default.** Full keyboard navigation, ARIA tab/dialog patterns,
-  a visible motion toggle, and complete `prefers-reduced-motion` fallbacks that
-  collapse every animation to a still, usable state.
-- **Resilient rendering.** If WebGL fails or the context is lost, the original
-  video and an SVG poster take over without blocking any content.
+- **One take.** The page plays as a single continuous camera move. A fixed
+  stage layer is re-lit per scene (registered CSS custom properties), so
+  sections never hard-cut: cool key light for the opening, warm for Origins,
+  each project's own colour in Selected Work, daylight for the Toolkit and
+  Method, tungsten for the finale.
+- **Two character films, bookending the story.** Alpha-matted video composited
+  in WebGL: Kiran walks in and stands in front of his own title in the hero,
+  and adjusts his tie in the closing scene beside the contact details.
+- **Scroll choreography** with GSAP ScrollTrigger + Lenis: a pinned chapter
+  sequence for education, a pinned horizontal tracking shot through five
+  projects, and case studies that expand out of the clicked project frame.
+- **One motion vocabulary.** Shared eases and a declarative reveal system
+  (`data-reveal="lines|fade|rule|clip|stagger|count"`) instead of per-section
+  one-off tweens.
+- **Accessible by default.** Keyboard navigation, focus-trapped case files,
+  ARIA tab patterns where the chapters are pinned, a visible Motion toggle,
+  full `prefers-reduced-motion` support, and reflow at 200% text size.
 
 ## Getting started
 
@@ -50,23 +56,26 @@ Static assets under `/assets` are served with a long-lived immutable cache heade
 ## Project structure
 
 ```
-public/
-  assets/            fonts, logos, and the matte-extracted film sources
-  favicon.svg
+public/assets/       fonts, logos, résumé and the matte-extracted films
 src/
-  App.tsx            page shell, section composition, motion setup
-  main.tsx           entry point and stylesheet imports
-  data.ts            all portfolio content (journey, work, toolkit, contact)
+  App.tsx            scene composition, motion state, case-study routing
+  data.ts            all portfolio content
+  motion/
+    gsap.ts          plugin registration and the shared eases
+    lenis.ts         smooth scroll on the GSAP ticker, scroll locking
+    scenes.ts        running order + the director that re-lights the stage
+    reveals.ts       declarative reveal system
   components/
-    Character.tsx    hero film orchestration
-    TieAdjust.tsx    experience film orchestration
-    alphaStudio.ts   WebGL renderer for the alpha-matted character films
-    world.ts         WebGL renderer for the journey and work scenes
-    Journey.tsx      pinned education timeline
-    Work.tsx         bounded horizontal project gallery
-    ...              remaining sections and UI
-  *.css              layered stylesheets (site, sections, editorial, polish)
-tests/               Playwright coverage for layout, motion and accessibility
+    Hero.tsx         opening shot (name behind the transparent film plate)
+    Character.tsx    hero film playback and controls
+    alphaStudio.ts   WebGL compositor for the alpha-matted films
+    Journey.tsx      pinned chapter sequence
+    Work.tsx         pinned horizontal gallery; ProjectVisual.tsx diagrams
+    CaseStudy.tsx    expanding case file
+    Contact.tsx      finale (tie film), contact and end credits
+    ...              header, scene index, loader, toolkit, method
+  styles/            tokens, base, stage and one stylesheet per scene
+tests/               Playwright coverage for layout, motion, media and a11y
 ```
 
 ## Testing
