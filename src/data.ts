@@ -77,3 +77,31 @@ export const projects: Project[] = [
 { id:'vsyk',title:'VSYK Chits',category:'FULL-STACK MOBILE · OPERATIONS',summary:'One platform for members, auctions, and administration.',tags:['React Native','Supabase','TypeScript'],color:'#dec097',steps:['Members','Installments','Auctions','Administration'],problem:'Members and administrators need a coherent way to navigate groups, installments, auction activity and operational records.',system:'The repository describes Expo/React Native member and admin experiences with group browsing, transaction history, live auctions, wallet/payment flows, customer administration, settlements and reporting. Express, Supabase Auth/PostgreSQL/Realtime, Razorpay, TanStack Query and Zustand underpin the stack, with English/Tamil localization.',contribution:'Selected full-stack project from my public repository. Individual component authorship is not documented here; repository ownership is not presented as sole authorship.',evidence:'Source and architecture documentation describe the feature surface. The customer-detail feature audit distinguishes implemented, partial and TODO areas; feature listings alone do not establish end-to-end completion.',limitations:'The audit may reflect an earlier state. No production completeness, real users, payment volume, app-store release or financial compliance is claimed. The portfolio diagram uses no customer or payment data.',links:[{label:'Application source',url:github+'VSYK_APP'},{label:'Feature audit',url:github+'VSYK_APP/blob/main/docs/architecture/FEATURE_AUDIT.md'}]},
 { id:'joulet',title:'Joulet',category:'ENERGY SYSTEMS · CRYPTOGRAPHY',summary:'Verifying energy data before it becomes on-chain value.',tags:['Python','Solidity','Zero-knowledge proofs'],color:'#e2bf6f',steps:['Simulate','Sign','Verify','Record'],problem:'Before energy readings become blockchain records, a verification pipeline needs to check their origin, plausibility and freshness.',system:'Modelica solar readings become ECDSA-signed packets. Three oracle nodes check signatures, capacity, solar hours, rate of change, weather corroboration and replay nonces before consensus and batching. Flask/Python, Redis, Solidity/Hardhat, Merkle proofs and ZoKrates-based capacity proofs support the prototype and dashboard.',contribution:'The team README explicitly credits Kiran Kishore V with Phase 2 signing, Phase 3 oracle work and Phase 6 zero-knowledge proofs. Other phases are team contributions.',evidence:'The public repository documents a simulation-backed pipeline and local Hardhat environment. Oracle source provides implementation evidence for the validation checks.',limitations:'A capacity-bound ZK circuit does not prove all physical laws or real sensor truth. Readings are simulated; prototype carbon NFTs are not certified tradable credits. The README’s transaction-reduction claim is omitted because a documented comparison was not established.',links:[{label:'Team source & credits',url:github+'Joulet'},{label:'Oracle implementation',url:github+'Joulet/blob/main/oracle/oracle_node.py'}]}
 ];
+
+export type Credential = {
+  id: string; title: string; code?: string; issuer: string; issued: string; expires?: string;
+  score?: { value: number; max: number }; credentialId: string; summary: string; skills: string[];
+  badge: string; color: string; verify: { label: string; url: string }; certificate?: string;
+};
+export const credentials: Credential[] = [
+ { id:'aws-ai-practitioner', title:'AWS Certified AI Practitioner', code:'AIF-C01', issuer:'Amazon Web Services', issued:'2026-09-26', expires:'2029-09-26',
+   score:{value:1000,max:1000}, credentialId:'593718b8458d4f35ace51a4db32d6080',
+   summary:'AI, ML and generative AI concepts on AWS: choosing the right technique for a use case, applying foundation models, and using AI responsibly and securely.',
+   skills:['Generative AI','Foundation models','Responsible AI','AI security & governance'],
+   badge:'/assets/credentials/aws-ai-practitioner.webp', color:'#7fd3c7',
+   verify:{label:'Verify on Credly',url:'https://www.credly.com/badges/eedd31e6-fcfb-464d-85fa-26ec5571b8df/public_url'},
+   certificate:'/assets/credentials/aws-ai-practitioner-certificate.pdf' },
+ { id:'aws-cloud-practitioner', title:'AWS Certified Cloud Practitioner', code:'CLF-C02', issuer:'Amazon Web Services', issued:'2026-09-29', expires:'2029-09-29',
+   score:{value:925,max:1000}, credentialId:'bce53ad02587422ea091143989fe66bd',
+   summary:'Foundational AWS fluency: cloud concepts, security and compliance, core services and architecture, and pricing and support models.',
+   skills:['Cloud concepts','Security & compliance','Core AWS services','Billing & pricing'],
+   badge:'/assets/credentials/aws-cloud-practitioner.webp', color:'#f2b45c',
+   verify:{label:'Verify on Credly',url:'https://www.credly.com/badges/0b626870-1608-49a7-a3f2-e3c85dc56bd8/public_url'},
+   certificate:'/assets/credentials/aws-cloud-practitioner-certificate.pdf' },
+ { id:'cyfrin-blockchain-basics', title:'Blockchain Basics', issuer:'Cyfrin Updraft', issued:'2026-02-11',
+   credentialId:'XORURP7VTYW2',
+   summary:'Completed every lesson of the Blockchain Basics course and passed its proficiency exam: how blockchains work, smart contracts, on-chain transactions, decentralization and scalability.',
+   skills:['Blockchain fundamentals','Smart contracts','On-chain transactions'],
+   badge:'/assets/credentials/cyfrin-blockchain-basics.webp', color:'#a99cff',
+   verify:{label:'Verify on Cyfrin',url:'https://profiles.cyfrin.io/u/kirankishore07/achievements/blockchain-basics'} },
+];

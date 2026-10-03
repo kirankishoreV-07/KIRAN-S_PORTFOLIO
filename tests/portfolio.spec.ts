@@ -1,13 +1,13 @@
 import {test,expect} from '@playwright/test';
-import {enterPortfolio} from './helpers';
+import {enterPortfolio,gutter,subjectExtent} from './helpers';
 import AxeBuilder from '@axe-core/playwright';
 const ids=['lazarus','sign-language','urbanpulse','vsyk','joulet'];
 test('desktop bounded gallery reaches every project and exits to toolkit',async({page})=>{
  await page.setViewportSize({width:1440,height:1000});await enterPortfolio(page);await page.locator('.primary-button').click();
  await expect(page.locator('#work')).toHaveClass(/is-horizontal/);
  for(let i=0;i<5;i++){
-  await page.locator('.project-nav button').nth(i).click();await page.waitForTimeout(700);
-  const box=await page.locator('#'+ids[i]).boundingBox();expect(box!.x).toBeGreaterThanOrEqual(70);expect(box!.x).toBeLessThan(100);
+  await page.locator('.project-nav button').nth(i).click();await page.waitForTimeout(1600);
+  const box=await page.locator('#'+ids[i]).boundingBox();const g=await gutter(page);expect(Math.abs(box!.x-g)).toBeLessThan(14);
   await page.locator('#'+ids[i]+' .project-actions button').click();await expect(page.locator('dialog')).toBeVisible();await page.keyboard.press('Escape');await expect(page.locator('dialog')).toHaveCount(0);await expect(page.locator('#'+ids[i]+' .project-actions button')).toBeFocused();
  }
  await page.mouse.wheel(0,600);await page.waitForTimeout(700);await expect(page.locator('#toolkit')).toBeInViewport();
@@ -17,7 +17,7 @@ for(const width of [390,768,1440])test(`layout and accessibility at ${width}`,as
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  await expect(page.locator('.project-card')).toHaveCount(5);
  const results=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(results.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,message:n.any.map(a=>a.message)}))}))).toEqual([]);
- await page.locator('.primary-button').click();await page.waitForTimeout(600);
+ await page.locator('.primary-button').click();await page.waitForTimeout(2200);
  const workResults=await new AxeBuilder({page}).withTags(['wcag2a','wcag2aa','wcag21aa']).analyze();expect(workResults.violations.map(v=>({id:v.id,nodes:v.nodes.map(n=>({target:n.target,message:n.any.map(a=>a.message)}))}))).toEqual([]);
 });
 test('reduced motion, explicit toggle, resizing and 200% text',async({page})=>{
@@ -29,7 +29,7 @@ test('reduced motion, explicit toggle, resizing and 200% text',async({page})=>{
  expect(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth)).toBe(true);
  expect(await page.locator('h1').evaluate(el=>{const range=document.createRange();range.selectNodeContents(el);return [...range.getClientRects()].every(r=>r.right<=innerWidth)})).toBe(true);
 });
-test('direct links, keyboard dialog trap, résumé and contact',async({page})=>{
+test('direct links, keyboard dialog trap, resume and contact',async({page})=>{
  await page.goto('/#toolkit');await page.waitForSelector('.loading-screen',{state:'detached',timeout:4000}).catch(()=>{});await expect(page.locator('#toolkit')).toBeInViewport();
  await page.goto('/#case/joulet');await page.waitForSelector('.loading-screen',{state:'detached',timeout:4000}).catch(()=>{});await expect(page.locator('dialog')).toBeVisible();await expect(page.locator('#case-title')).toHaveText('Joulet');
  await page.keyboard.press('Shift+Tab');expect(await page.evaluate(()=>document.activeElement?.closest('dialog')!==null)).toBe(true);
@@ -37,7 +37,7 @@ test('direct links, keyboard dialog trap, résumé and contact',async({page})=>{
  const response=await page.request.get('/assets/kiran-resume.pdf');expect(response.ok()).toBe(true);expect((await response.body()).subarray(0,4).toString()).toBe('%PDF');
  await expect(page.locator('.email-link')).toHaveAttribute('href','mailto:kiransjobs7@gmail.com');
  await expect(page.getByRole('link',{name:'Instagram'})).toHaveAttribute('href','https://www.instagram.com/_kiran_kishore/');
- await expect(page.getByRole('link',{name:'X ↗'})).toHaveAttribute('href','https://x.com/kirann__77');
+ await expect(page.getByRole('link',{name:'X',exact:true})).toHaveAttribute('href','https://x.com/kirann__77');
 });
 test('SignLink presents the supplied product UI and public-place use case',async({page})=>{
  await page.goto('/#case/sign-language');await page.waitForSelector('.loading-screen',{state:'detached',timeout:4000}).catch(()=>{});
@@ -66,7 +66,7 @@ test('introduction starts automatically, replay restarts and leaving pauses',asy
  await expect.poll(()=>film.evaluate((v:HTMLVideoElement)=>v.paused)).toBe(true);
  await page.getByRole('button',{name:'Replay introduction'}).click();
  expect(await film.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeLessThan(1);
- await page.getByRole('link',{name:'View Work',exact:false}).click();
+ await page.getByRole('link',{name:'View selected work'}).click();
  await expect.poll(()=>film.evaluate((v:HTMLVideoElement)=>v.paused)).toBe(true);
  await page.locator('#intro').scrollIntoViewIfNeeded();
  await expect.poll(()=>film.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeGreaterThan(.1);
@@ -99,14 +99,14 @@ test('mobile keeps the high-detail film, full frame and held ending',async({page
  await film.evaluate((v:HTMLVideoElement)=>{v.currentTime=9.5;});await page.waitForTimeout(1000);
  expect(await film.evaluate((v:HTMLVideoElement)=>v.ended&&v.paused&&v.currentTime>9.9)).toBe(true);
  await expect(page.getByRole('button',{name:'Play again'})).toBeVisible();
- const videoBox=await film.boundingBox();expect(videoBox!.x).toBeGreaterThanOrEqual(-1);expect(videoBox!.x+videoBox!.width).toBeLessThanOrEqual(391);expect(videoBox!.width/videoBox!.height).toBeCloseTo(16/9,1);
+ const subject=await subjectExtent(page);expect(subject.left).toBeGreaterThanOrEqual(0);expect(subject.right).toBeLessThanOrEqual(390);expect(subject.ratio).toBeCloseTo(16/9,1);
  const endedTime=await film.evaluate((v:HTMLVideoElement)=>v.currentTime);await page.waitForTimeout(500);expect(await film.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBe(endedTime);
 });
-test('tie-adjust sequence restarts when the experience section re-enters',async({page})=>{
+test('tie-adjust finale restarts when the contact scene re-enters',async({page})=>{
  await enterPortfolio(page);const film=page.locator('.tie-figure');
- await page.locator('#experience').scrollIntoViewIfNeeded();await expect.poll(()=>film.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeGreaterThan(.2);
+ await page.locator('#tie-adjust').scrollIntoViewIfNeeded();await expect.poll(()=>film.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeGreaterThan(.2);
  await page.locator('#toolkit').scrollIntoViewIfNeeded();await expect.poll(()=>film.evaluate((v:HTMLVideoElement)=>v.paused)).toBe(true);
- await page.locator('#experience').scrollIntoViewIfNeeded();await expect.poll(()=>film.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeGreaterThan(.1);
+ await page.locator('#tie-adjust').scrollIntoViewIfNeeded();await expect.poll(()=>film.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeGreaterThan(.1);
  expect(await film.evaluate((v:HTMLVideoElement)=>v.currentTime)).toBeLessThan(2);
 });
 test('motion toggle stops automatic playback, manual play remains available',async({page})=>{

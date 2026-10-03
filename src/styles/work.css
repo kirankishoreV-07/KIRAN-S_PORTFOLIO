@@ -1,0 +1,136 @@
+.work { --card-w: min(84vw, 1380px); --card-gap: clamp(2rem, 4vw, 4.5rem); }
+.work-titlebar {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  align-items: end;
+  gap: 1.5rem 4rem;
+}
+.work-titlebar .lead { justify-self: end; }
+.project-nav {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  margin-top: clamp(1.5rem, 4vh, 2.75rem);
+  border-top: 1px solid var(--line);
+}
+.project-nav button {
+  position: relative;
+  display: flex;
+  align-items: baseline;
+  gap: 0.7rem;
+  padding: 0.9rem 0.25rem 0.2rem 0;
+  border: 0;
+  background: none;
+  color: var(--fg-2);
+  font-size: 0.92rem;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+.project-nav button::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 1.5rem;
+  top: -1px;
+  height: 1px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.7s var(--ease-out);
+}
+.project-nav button:hover, .project-nav button[aria-current='true'] { color: var(--fg); }
+.project-nav button[aria-current='true']::before { transform: scaleX(1); }
+.project-nav .num { font-size: 0.7rem; color: var(--accent); }
+
+.project-track { display: flex; gap: var(--card-gap); }
+.project-card {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 2rem clamp(2rem, 4vw, 4.5rem);
+  align-items: center;
+}
+.project-frame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  border-radius: var(--radius-l);
+  overflow: hidden;
+  cursor: pointer;
+  container-type: inline-size;
+  background: #0b0c0f;
+  box-shadow:
+    0 50px 100px -50px color-mix(in oklab, var(--project-color) 45%, transparent),
+    inset 0 0 0 1px #ffffff14;
+  will-change: transform;
+}
+.project-copy { display: grid; justify-items: start; gap: 1.1rem; }
+.project-index { font-size: 0.8rem; color: var(--accent); }
+.project-index span { color: var(--fg-2); }
+.project-category { color: var(--project-color); }
+:root[data-tone='light'] .project-category { color: var(--fg-2); }
+.project-title {
+  font-family: var(--serif);
+  font-size: clamp(3rem, 5.6vw, 6.25rem);
+  line-height: 0.9;
+  letter-spacing: -0.03em;
+}
+.project-summary { font-size: clamp(1.05rem, 1.25vw, 1.25rem); color: var(--fg-2); max-width: 30ch; line-height: 1.45; }
+.metric-note { font-size: var(--t-small); color: var(--fg-2); max-width: 34ch; }
+.metric-note strong { display: block; font-size: 2.6rem; line-height: 1; color: var(--project-color); font-weight: 400; margin-bottom: 0.2rem; }
+.project-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 1rem 1.75rem; margin-top: 0.6rem; }
+
+.work-foot { display: flex; align-items: center; gap: 1.5rem; margin-top: 2rem; }
+.work-progress { flex: 1; height: 1px; background: var(--line); overflow: hidden; }
+.work-progress span { display: block; height: 100%; background: var(--fg); transform: scaleX(0.2); transform-origin: 0 50%; transition: transform 0.4s var(--ease-out); }
+
+/* Horizontal tracking shot. */
+.work.is-horizontal { padding-block: 0; }
+.work.is-horizontal .work-stage {
+  height: 100svh;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
+  padding-top: calc(var(--header-h) + 0.5rem);
+  padding-bottom: 1.4rem;
+  overflow: hidden;
+}
+.work.is-horizontal .scene-slate { margin-bottom: clamp(1rem, 3vh, 2rem); }
+.work.is-horizontal .title { font-size: clamp(2.6rem, 4.6vw, 4.9rem); }
+.work.is-horizontal .work-window { min-height: 0; display: flex; align-items: center; padding-block: clamp(1rem, 3vh, 2.5rem); }
+.work.is-horizontal .project-track {
+  height: 100%;
+  width: 100%;
+
+  padding-inline: var(--gutter) calc(100vw - var(--gutter) - var(--card-w));
+  will-change: transform;
+}
+.work.is-horizontal .project-card { flex: 0 0 var(--card-w); height: 100%; container-type: size; }
+.work.is-horizontal .project-frame { width: min(100%, 100cqh * 1.6); justify-self: end; }
+.work.is-horizontal .work-foot { margin-top: 0; }
+
+/* Short laptop screens: tighten the frame so every action stays in shot. */
+@media (max-height: 820px) {
+  .work.is-horizontal .scene-slate { display: none; }
+  .work.is-horizontal .work-stage { padding-top: calc(var(--header-h) + 0.25rem); }
+  .work.is-horizontal .title { font-size: clamp(2.3rem, 3.8vw, 3.8rem); }
+  .work.is-horizontal .project-nav { margin-top: 1rem; }
+  .work.is-horizontal .project-copy { gap: 0.75rem; }
+  .work.is-horizontal .project-title { font-size: clamp(2.6rem, 4.4vw, 4.6rem); }
+  .work.is-horizontal .metric-note strong { display: inline; font-size: 1.5rem; margin-right: 0.35rem; }
+}
+
+/* Stacked: phones, tablets, motion off. */
+.work:not(.is-horizontal) .project-track {
+  flex-direction: column;
+  gap: clamp(5rem, 12vh, 8rem);
+  max-width: var(--max);
+  margin: clamp(3.5rem, 8vh, 6rem) auto 0;
+  padding-inline: var(--gutter);
+}
+.work:not(.is-horizontal) .work-foot { display: none; }
+@media (max-width: 1023px) {
+  .work:not(.is-horizontal) .project-card { grid-template-columns: minmax(0, 1fr); }
+  .work-titlebar { grid-template-columns: minmax(0, 1fr); }
+  .work-titlebar .lead { justify-self: start; }
+  .project-nav { grid-template-columns: repeat(5, max-content); overflow-x: auto; gap: 1.5rem; scrollbar-width: none; }
+}

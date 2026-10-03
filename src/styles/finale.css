@@ -1,0 +1,174 @@
+.contact { padding-bottom: clamp(4rem, 10vh, 7rem); }
+.contact-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.85fr);
+  gap: 3rem 4vw;
+  align-items: start;
+}
+.contact-title { max-width: 11ch; }
+.contact-copy .lead { margin-top: 2rem; max-width: 36ch; }
+.email-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  margin-top: clamp(2.5rem, 6vh, 4rem);
+  padding-bottom: 0.3rem;
+  font-family: var(--serif);
+  font-size: clamp(1.9rem, 4.2vw, 4.25rem);
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+.email-link::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  background: var(--line);
+}
+.email-link::before {
+  content: '';
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 1px;
+  z-index: 1;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform 0.9s var(--ease-out);
+}
+.email-link:hover::before { transform: scaleX(1); }
+.email-link .icon-arrow { width: 0.5em; height: 0.5em; color: var(--accent); transition: transform 0.5s var(--ease-out); }
+.email-link:hover .icon-arrow { transform: translate(4px, -4px); }
+.contact-actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; }
+.copy-status { min-height: 1.5em; margin-top: 0.75rem; font-size: var(--t-small); color: var(--fg-2); }
+
+.contact-links { display: grid; margin-top: clamp(2.5rem, 6vh, 4rem); }
+.contact-links a {
+  display: grid;
+  grid-template-columns: minmax(8rem, 0.6fr) minmax(0, 1fr) minmax(0, 1.4fr);
+  align-items: baseline;
+  gap: 0.35rem 1.5rem;
+  padding-block: 1.2rem;
+  border-top: 1px solid var(--line);
+}
+.contact-links a > * { transition: transform 0.5s var(--ease-out), color 0.3s; }
+.contact-links li:last-child a { border-bottom: 1px solid var(--line); }
+.contact-links .label .num { color: var(--accent); margin-right: 0.4em; }
+.contact-link-title { display: inline-flex; align-items: center; gap: 0.5rem; font-size: 1.15rem; font-weight: 500; transition: color 0.3s; }
+.contact-link-note { color: var(--fg-2); font-size: var(--t-small); }
+.contact-links a:hover > * { transform: translateX(0.75rem); }
+.contact-links a:hover .contact-link-title { color: var(--accent); }
+.contact-elsewhere { display: flex; flex-wrap: wrap; align-items: center; gap: 0.5rem 1.75rem; margin-top: 2rem; }
+
+.contact-film {
+  position: sticky;
+  top: calc(var(--header-h) + 1rem);
+  display: grid;
+  gap: 1rem;
+}
+.tie-host {
+  position: relative;
+  height: min(calc(100svh - var(--header-h) - 5rem), 860px);
+  min-height: 420px;
+  isolation: isolate;
+  overflow: clip;
+}
+.tie-host > .webgl-tie-studio {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  pointer-events: none;
+  mask-image: linear-gradient(to bottom, #000 80%, transparent);
+}
+.tie-host .character-area,
+.tie-host .portrait-frame { position: static; }
+.tie-host .tie-entrance-scene {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  height: 100%;
+  aspect-ratio: 16 / 9;
+  translate: -50% 0;
+}
+.tie-poster-fallback {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+.tie-host .intro-controls {
+  position: absolute;
+  left: 50%;
+  bottom: 1rem;
+  z-index: 2;
+  translate: -50% 0;
+}
+.contact-status { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 0.3em 0.6em; text-align: center; }
+.contact-status b { color: var(--fg); font-weight: 500; }
+
+/* ---------- end credits ---------- */
+.credits { position: relative; z-index: var(--z-content); overflow: hidden; padding-top: clamp(4rem, 10vh, 7rem); }
+.credits-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem 2rem;
+  padding-block: 1.5rem;
+  border-top: 1px solid var(--line);
+}
+
+/* End title: the full name in extruded type, never cropped. */
+.wordmark {
+  padding: clamp(2rem, 6vh, 4rem) var(--gutter) clamp(2.5rem, 7vh, 5rem);
+  perspective: 1400px;
+  perspective-origin: 50% 0%;
+}
+.wm-stage {
+  display: flex;
+  justify-content: center;
+  gap: 0.22em;
+  font-family: var(--serif);
+  /* "Kiran Kishore" spans ~4.45em in Instrument Serif; fit it gutter to gutter. */
+  font-size: calc((100vw - 2 * var(--gutter)) / 4.55);
+  line-height: 0.9;
+  letter-spacing: -0.035em;
+  white-space: nowrap;
+  transform-style: preserve-3d;
+  user-select: none;
+}
+.wm-word { display: inline-flex; transform-style: preserve-3d; }
+.wm-char {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+  color: #eee9e0;
+  text-shadow:
+    0 0.0045em 0 #cfc9bf, 0 0.0090em 0 #bfb9af, 0 0.0135em 0 #afa99f, 0 0.0180em 0 #9f998f,
+    0 0.0225em 0 #8f897f, 0 0.0270em 0 #7f796f, 0 0.0315em 0 #6f695f,
+    0 0.06em 0.08em rgb(0 0 0 / 0.55), 0 0.13em 0.25em rgb(0 0 0 / 0.45);
+}
+.wm-word--em .wm-char {
+  font-style: italic;
+  color: #f0a46c;
+  text-shadow:
+    0 0.0045em 0 #dc9259, 0 0.0090em 0 #c9824b, 0 0.0135em 0 #b6733e, 0 0.0180em 0 #a36433,
+    0 0.0225em 0 #905629, 0 0.0270em 0 #7d4920, 0 0.0315em 0 #6a3c18,
+    0 0.06em 0.08em rgb(0 0 0 / 0.55), 0 0.13em 0.25em rgb(0 0 0 / 0.45);
+}
+
+@media (max-width: 1023px) {
+  .contact-grid { grid-template-columns: minmax(0, 1fr); }
+  .contact-film { position: relative; top: auto; }
+  .tie-host { height: 72svh; }
+}
+@media (max-width: 640px) {
+  .contact-links a { grid-template-columns: minmax(0, 1fr); }
+}

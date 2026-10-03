@@ -1,9 +1,89 @@
-import { useState } from 'react';
-import { interests, approach } from '../data';
-import { IconArrowUpRight } from './icons';
-const outputs=['A clear problem and its constraints.','A working experiment that tests the idea.','Evidence of what works and what needs attention.','A usable system with documented decisions.'];
-export function Interests(){const [active,setActive]=useState(0);
- return <section id="interests" className="interests section-padding"><div className="interests-heading"><p className="eyebrow">06 / HOW I THINK &amp; BUILD</p><h2>Curiosity meets<br/><span>implementation.</span></h2><p className="interests-lead">I explore how intelligent systems work, then build the software that makes them useful. My process connects questions, experiments and evidence.</p></div>
- <div className="approach-list"><div className="process-track" aria-label="Explore my process">{approach.map((a,i)=><button className={'approach-step'+(active===i?' is-active':'')} key={a.step} aria-pressed={active===i} aria-controls="process-detail" onClick={()=>setActive(i)}><span className="approach-index">0{i+1}</span><span>{a.step}</span><span aria-hidden="true"><IconArrowUpRight/></span></button>)}</div><div id="process-detail" className="process-detail" key={active}><span className="process-watermark" aria-hidden="true">0{active+1}</span><div><p className="eyebrow">FROM QUESTION TO DELIVERY</p><h3>{approach[active].step}</h3><p>{approach[active].body}</p></div><div className="process-output"><span>THE OUTPUT</span><p>{outputs[active]}</p></div></div></div>
- <div className="interests-list"><div className="interest-intro"><p className="eyebrow">ONGOING EXPLORATION</p><h3>Questions that<br/>keep me building.</h3></div>{interests.map((item,i)=><details className="interest-item" key={item.title}><summary><span>0{i+1}</span><h4>{item.title}</h4><b aria-hidden="true">+</b></summary><p>{item.note}</p></details>)}</div></section>;
+import { useLayoutEffect, useRef, useState } from 'react';
+import { gsap } from '../motion/gsap';
+import { useReveals } from '../motion/reveals';
+import { approach, interests } from '../data';
+
+const outputs = [
+  'A clear problem and its constraints.',
+  'A working experiment that tests the idea.',
+  'Evidence of what works and what needs attention.',
+  'A usable system with documented decisions.',
+];
+
+/** Scene 06. The method reads as one continuous line drawn through four
+ * steps, then the open questions that keep the work moving. */
+export function Interests({ motion }: { motion: boolean }) {
+  const root = useRef<HTMLElement>(null);
+  const line = useRef<HTMLSpanElement>(null);
+  const [lit, setLit] = useState(motion ? -1 : approach.length - 1);
+  useReveals(root, motion);
+
+  useLayoutEffect(() => {
+    if (!motion) {
+      setLit(approach.length - 1);
+      return;
+    }
+    const ctx = gsap.context(() => {
+      // Each step's marker sits at i / n along the line; it lights as the
+      // drawn line reaches it. CSS maps --p to scaleX or scaleY per layout.
+      gsap.fromTo(line.current, { '--p': 0 }, {
+        '--p': 1,
+        ease: 'none',
+        scrollTrigger: {
+          trigger: '.process',
+          start: 'top 75%',
+          end: 'bottom 55%',
+          scrub: 0.6,
+          onUpdate: (self) => setLit(self.progress < 0.02 ? -1 : Math.min(approach.length - 1, Math.floor(self.progress * approach.length + 0.02))),
+        },
+      });
+    }, root);
+    return () => ctx.revert();
+  }, [motion]);
+
+  return (
+    <section id="interests" ref={root} className="method scene">
+      <div className="wrap">
+        <div className="scene-slate">
+          <p className="label"><span>06</span>Method</p>
+          <p className="label">How I think &amp; build</p>
+        </div>
+        <div className="scene-head">
+          <h2 className="title" data-reveal="lines">Curiosity meets <em>implementation.</em></h2>
+          <p className="lead" data-reveal="fade">I explore how intelligent systems work, then build the software that makes them useful. My process connects questions, experiments and evidence.</p>
+        </div>
+
+        <div className="process">
+          <span className="process-line" aria-hidden="true"><span ref={line} /></span>
+          <ol className="process-steps">
+            {approach.map((a, i) => (
+              <li key={a.step} className={'process-step' + (i <= lit ? ' is-lit' : '')}>
+                <span className="process-dot" aria-hidden="true" />
+                <span className="num process-index">0{i + 1}</span>
+                <h3>{a.step}</h3>
+                <p className="body-copy">{a.body}</p>
+                <p className="process-output"><span className="label">The output</span>{outputs[i]}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+
+        <div className="questions">
+          <div className="questions-head">
+            <p className="label">Ongoing exploration</p>
+            <h3 className="questions-title" data-reveal="lines">Questions that <em>keep me building.</em></h3>
+          </div>
+          <ol className="question-list" data-reveal="stagger">
+            {interests.map((q, i) => (
+              <li className="question" key={q.title}>
+                <span className="num">0{i + 1}</span>
+                <h4>{q.title}</h4>
+                <p>{q.note}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      </div>
+    </section>
+  );
 }

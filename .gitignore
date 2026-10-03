@@ -6,6 +6,7 @@ dist/
 *.tsbuildinfo
 
 # test artifacts
+.playwright-cli/
 test-results/
 playwright-report/
 
