@@ -2,6 +2,7 @@ import { useLayoutEffect, useRef, type CSSProperties } from 'react';
 import { gsap } from '../motion/gsap';
 import { Character, type CharacterAssets } from './Character';
 import { IconArrowDown, IconArrowUpRight } from './icons';
+import { resumeUrl } from '../data';
 
 const characterAssets: CharacterAssets = {
   entrance: '/assets/kiran-studio-desktop.mp4',
@@ -144,7 +145,7 @@ export function Hero({ motion, ready, opening }: { motion: boolean; ready: boole
         </p>
         <div className="hero-actions" data-hero-in>
           <a className="btn primary-button magnetic" href="#work">View selected work <IconArrowUpRight /></a>
-          <a className="link-line resume-link" href="/assets/kiran-resume.pdf" download>Download Resume <IconArrowDown /></a>
+          <a className="link-line resume-link" href={resumeUrl} download>Download Resume <IconArrowDown /></a>
         </div>
       </div>
 

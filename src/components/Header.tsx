@@ -3,6 +3,7 @@ import { ScrollTrigger } from '../motion/gsap';
 import { isGliding, lockScroll } from '../motion/lenis';
 import { useScene } from '../motion/scenes';
 import { IconArrowDown, IconArrowUpRight, IconClose } from './icons';
+import { resumeUrl } from '../data';
 
 const NAV = [
   { id: 'journey', label: 'Journey' },
@@ -66,7 +67,7 @@ export function Header({ ready, motion, reduced, onToggleMotion }: Props) {
             ))}
           </nav>
           <div className="header-tools">
-            <a className="header-resume" href="/assets/kiran-resume.pdf" download>Resume <IconArrowDown /></a>
+            <a className="header-resume" href={resumeUrl} download>Resume <IconArrowDown /></a>
             <button className="motion-toggle" onClick={onToggleMotion} aria-pressed={motion} title={motionTitle}>
               <span className="motion-dot" aria-hidden="true" />Motion {motion ? 'on' : 'off'}
             </button>
@@ -95,7 +96,7 @@ export function Header({ ready, motion, reduced, onToggleMotion }: Props) {
         </nav>
         <div className="menu-foot">
           <a href={'mailto:' + EMAIL}>{EMAIL} <IconArrowUpRight /></a>
-          <a href="/assets/kiran-resume.pdf" download>Download Resume <IconArrowDown /></a>
+          <a href={resumeUrl} download>Download Resume <IconArrowDown /></a>
           <button className="menu-motion" onClick={onToggleMotion} aria-pressed={motion} title={motionTitle}>
             <span className="motion-dot" aria-hidden="true" />Motion {motion ? 'on' : 'off'}
           </button>

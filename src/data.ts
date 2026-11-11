@@ -1,4 +1,5 @@
 export const intro = ["Hi, I’m Kiran, an AI developer building agentic AI, computer vision and cloud solutions.", "I turn real-world problems into working software—here’s a look at my work."];
+export const resumeUrl = '/assets/kiran-resume.pdf?v=a109d18e9db9';
 
 export type JourneyStop = { id:string; place:string; period:string; tags:string[]; body:string };
 export const journey: JourneyStop[] = [
@@ -7,7 +8,7 @@ export const journey: JourneyStop[] = [
  { id:'chaitanya', place:'Chaitanya Techno School', period:'Grades 11–12 · 2021–2023', tags:['Higher Secondary','Grades 11–12','2021–2023'],
    body:'Higher secondary education, grades 11 and 12, from 2021 to 2023 — the years the direction toward engineering and computing took shape.' },
  { id:'amrita', place:'Amrita Vishwa Vidyapeetham, Coimbatore', period:'2023–2027 · Currently pursuing', tags:['CSE (AI)','Coimbatore','2023–2027'],
-   body:'B.Tech in Computer Science & Engineering (AI), Amrita School of AI. Currently pursuing, CGPA 8.06.' },
+   body:'B.Tech in Computer Science & Engineering (AI), Amrita School of AI. Currently pursuing.' },
 ];
 
 export type ExperienceRole = { period:string; role:string; org:string; location:string; body:string };

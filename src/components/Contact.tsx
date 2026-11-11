@@ -3,6 +3,7 @@ import { gsap } from '../motion/gsap';
 import { useReveals } from '../motion/reveals';
 import { TieAdjust, type TieAssets } from './TieAdjust';
 import { IconArrowDown, IconArrowUp, IconArrowUpRight } from './icons';
+import { resumeUrl } from '../data';
 
 const email = 'kiransjobs7@gmail.com';
 const tieAssets: TieAssets = {
@@ -14,7 +15,7 @@ const tieAssets: TieAssets = {
 const resources = [
   { href: 'https://www.linkedin.com/in/v-kiran-kishore', kind: 'Professional', title: 'LinkedIn', note: 'Experience and professional connections', external: true },
   { href: 'https://github.com/kirankishoreV-07', kind: 'Code', title: 'GitHub', note: 'Explore repositories and implementation', external: true },
-  { href: '/assets/kiran-resume.pdf', kind: 'Profile', title: 'Download Resume', note: 'Education, experience and project overview', external: false },
+  { href: resumeUrl, kind: 'Profile', title: 'Download Resume', note: 'Education, experience and project overview', external: false },
 ];
 
 /** Scene 07. The closing beat mirrors the opening: he walked in at the

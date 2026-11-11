@@ -108,12 +108,6 @@ export function Journey({ motion }: { motion: boolean }) {
                   </p>
                   <h3 className="journey-place" style={{ '--d': 1 } as CSSProperties}>{stop.place}</h3>
                   <p className="body-copy" style={{ '--d': 2 } as CSSProperties}>{stop.body}</p>
-                  {stop.id === 'amrita' && (
-                    <p className="journey-stat" style={{ '--d': 3 } as CSSProperties}>
-                      <span className="journey-stat-value serif" data-reveal="count" data-value="8.06">8.06</span>
-                      <span className="label">CGPA · currently pursuing</span>
-                    </p>
-                  )}
                   <div className="tag-list" style={{ '--d': 4 } as CSSProperties}>
                     {stop.tags.map((t) => <span className="tag" key={t}>{t}</span>)}
                   </div>

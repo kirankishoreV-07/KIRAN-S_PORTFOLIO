@@ -34,10 +34,13 @@ test.describe('every control does what it says', () => {
   });
 
   test('downloads, mail, copy and external links are real', async ({ page }) => {
-    const resumes = page.locator('a[href="/assets/kiran-resume.pdf"]');
+    const resumes = page.locator('a[href^="/assets/kiran-resume.pdf"]');
     expect(await resumes.count()).toBeGreaterThanOrEqual(3);
-    for (const el of await resumes.all()) await expect(el).toHaveAttribute('download', '');
-    const pdf = await page.request.get('/assets/kiran-resume.pdf');
+    for (const el of await resumes.all()) {
+      await expect(el).toHaveAttribute('download', '');
+      await expect(el).toHaveAttribute('href', '/assets/kiran-resume.pdf?v=a109d18e9db9');
+    }
+    const pdf = await page.request.get((await resumes.first().getAttribute('href'))!);
     expect((await pdf.body()).subarray(0, 4).toString()).toBe('%PDF');
     await expect(page.locator('a[href^="mailto:kiransjobs7@gmail.com"]')).toHaveCount(3);
     await page.locator('#contact').scrollIntoViewIfNeeded();

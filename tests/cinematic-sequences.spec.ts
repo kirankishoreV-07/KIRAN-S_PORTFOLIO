@@ -29,7 +29,7 @@ test('laptop gallery stays bounded and all project actions remain reachable',asy
 test('reduced-motion journey is a readable timeline with every chapter',async({page})=>{
  await page.emulateMedia({reducedMotion:'reduce'});await page.goto('/#journey');await expect(page.locator('#journey')).toHaveAttribute('data-pinned','false');
  for(const place of ['Geethaanjali','Chaitanya','Amrita'])await expect(page.locator('#journey .journey-card',{hasText:place})).toBeVisible();
- await expect(page.locator('#journey')).toContainText('CGPA');await expect(page.locator('#journey').getByRole('tab')).toHaveCount(0);
+ await expect(page.locator('#journey')).not.toContainText(/C?GPA|8\.06/i);await expect(page.locator('#journey').getByRole('tab')).toHaveCount(0);
 });
 test('only the two character films own WebGL and they suspend outside view',async({page})=>{
  await page.goto('/');await page.waitForSelector('.loading-screen',{state:'detached',timeout:5000}).catch(()=>{});
