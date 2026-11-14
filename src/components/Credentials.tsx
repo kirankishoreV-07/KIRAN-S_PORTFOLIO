@@ -7,7 +7,7 @@ const month = new Intl.DateTimeFormat('en', { month: 'short', year: 'numeric', t
 const fmt = (iso: string) => month.format(new Date(iso));
 
 /** Credentials as physical cards: dealt onto the table as the block scrolls
- * in, then lit by the pointer while each badge turns in 3D above its card. Every card links to the issuer's own verification page. */
+ * in, then lit by the pointer while each badge turns in 3D above its card. Cards link to issuer verification or the supplied certificate. */
 export function Credentials({ motion }: { motion: boolean }) {
   const root = useRef<HTMLDivElement>(null);
 
@@ -43,8 +43,8 @@ export function Credentials({ motion }: { motion: boolean }) {
     <div className="credentials" ref={root}>
       <div className="cred-head">
         <p className="label">Credentials</p>
-        <h3 className="cred-title" data-reveal="lines">Certified. <em>Verified.</em></h3>
-        <p className="body-copy" data-reveal="fade">Two AWS certifications and a Cyfrin Updraft completion, each linked to the issuer’s official verification.</p>
+        <h3 className="cred-title" data-reveal="lines">Credentials. <em>In focus.</em></h3>
+        <p className="body-copy" data-reveal="fade">AWS certifications, Microsoft Applied Skills, and course completions from Hugging Face and Cyfrin Updraft. Explore issuer verification or the certificate for each.</p>
       </div>
 
       <ul className="cred-grid">
@@ -52,8 +52,8 @@ export function Credentials({ motion }: { motion: boolean }) {
           <li key={c.id} className="cred-card" style={{ '--cred': c.color } as CSSProperties} onPointerMove={tilt} onPointerLeave={rest}>
             <article className="cred-inner" aria-labelledby={'cred-' + c.id}>
               <span className="cred-glare" aria-hidden="true" />
-              <div className="cred-badge">
-                <img src={c.badge} alt={c.title + ' badge'} width="300" height="300" loading="lazy" />
+              <div className={'cred-badge' + (c.preview ? ' cred-badge--certificate' : '')}>
+                <img src={c.badge} alt={c.title + (c.preview ? ' certificate preview' : ' badge')} width="300" height="300" loading="lazy" />
               </div>
               <div className="cred-body">
                 <p className="label cred-issuer">{c.issuer}{c.code && <span> · {c.code}</span>}</p>
@@ -64,13 +64,13 @@ export function Credentials({ motion }: { motion: boolean }) {
                     <span className="cred-meter" aria-hidden="true"><span data-reveal="rule" style={{ transform: `scaleX(${c.score.value / c.score.max})` }} /></span>
                   </div>
                 ) : (
-                  <p className="cred-score cred-score--pass"><span className="serif">Passed</span><span className="num"> proficiency exam</span></p>
+                  <p className="cred-score cred-score--pass"><span className="serif">{c.result || 'Passed'}</span><span className="num">{c.resultDetail || 'proficiency exam'}</span></p>
                 )}
                 <p className="cred-summary">{c.summary}</p>
                 <dl className="cred-meta">
                   <div><dt className="label">Issued</dt><dd>{fmt(c.issued)}</dd></div>
                   {c.expires && <div><dt className="label">Valid until</dt><dd>{fmt(c.expires)}</dd></div>}
-                  <div className="cred-id"><dt className="label">Credential ID</dt><dd className="num" title={c.credentialId}>{c.credentialId}</dd></div>
+                  {c.credentialId && <div className="cred-id"><dt className="label">Credential ID</dt><dd className="num" title={c.credentialId}>{c.credentialId}</dd></div>}
                 </dl>
                 <div className="tag-list">{c.skills.map((s) => <span className="tag" key={s}>{s}</span>)}</div>
                 <div className="cred-actions">

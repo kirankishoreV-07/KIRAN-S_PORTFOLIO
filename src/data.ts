@@ -81,10 +81,22 @@ export const projects: Project[] = [
 
 export type Credential = {
   id: string; title: string; code?: string; issuer: string; issued: string; expires?: string;
-  score?: { value: number; max: number }; credentialId: string; summary: string; skills: string[];
+  score?: { value: number; max: number }; credentialId?: string; summary: string; skills: string[];
+  result?: string; resultDetail?: string; preview?: boolean;
   badge: string; color: string; verify: { label: string; url: string }; certificate?: string;
 };
 export const credentials: Credential[] = [
+ { id:'microsoft-integrated-agent', title:'Develop an agent with integrated tools', issuer:'Microsoft Applied Skills', issued:'2026-11-14',
+   credentialId:'4E2DF672628390B9', result:'Earned', resultDetail:'applied skills credential', preview:true,
+   summary:'Earned the Microsoft Applied Skills credential for developing an agent with integrated tools.',
+   skills:['AI agents','Tool integration'], badge:'/assets/credentials/microsoft-integrated-agent.png', color:'#75b9ef',
+   verify:{label:'Verify on Microsoft Learn',url:'https://learn.microsoft.com/en-us/users/kirankishorevenkatesan-3096/credentials/applied-skill/develop-an-agent-with-integrated-tools'},
+   certificate:'/assets/credentials/microsoft-integrated-agent-certificate.pdf' },
+ { id:'hugging-face-agents', title:'Hugging Face Agents Course', issuer:'Hugging Face', issued:'2026-11-13',
+   result:'Completed', resultDetail:'agents course', preview:true,
+   summary:'Successfully completed the Hugging Face Agents Course and received its Certificate of Excellence.',
+   skills:['AI agents','Agent workflows'], badge:'/assets/credentials/hugging-face-agents-certificate.webp', color:'#ffd34f',
+   verify:{label:'View certificate',url:'/assets/credentials/hugging-face-agents-certificate.webp'} },
  { id:'aws-ai-practitioner', title:'AWS Certified AI Practitioner', code:'AIF-C01', issuer:'Amazon Web Services', issued:'2026-09-26', expires:'2029-09-26',
    score:{value:1000,max:1000}, credentialId:'593718b8458d4f35ace51a4db32d6080',
    summary:'AI, ML and generative AI concepts on AWS: choosing the right technique for a use case, applying foundation models, and using AI responsibly and securely.',

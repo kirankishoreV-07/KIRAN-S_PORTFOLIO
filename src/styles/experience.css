@@ -167,6 +167,7 @@
   height: auto;
   filter: drop-shadow(0 22px 26px rgb(0 0 0 / 0.55));
 }
+.cred-badge--certificate img { width: 100%; max-width: 340px; height: 190px; object-fit: contain; }
 :root[data-motion='on'] .cred-badge img { animation: badge-float 6s ease-in-out infinite; }
 .cred-card:nth-child(2) .cred-badge img { animation-delay: -2s; }
 .cred-card:nth-child(3) .cred-badge img { animation-delay: -4s; }

@@ -26,7 +26,11 @@ for(const width of [390,768,1440])test(`redesigned sections remain accessible at
 });
 test('credentials link to official verification and the end title is complete',async({page})=>{
  await page.goto('/#experience');
- const cards=page.locator('.cred-card');await expect(cards).toHaveCount(3);
+ const cards=page.locator('.cred-card');await expect(cards).toHaveCount(5);
+ await expect(page.locator('#cred-microsoft-integrated-agent')).toHaveText('Develop an agent with integrated tools');
+ await expect(page.locator('#cred-hugging-face-agents')).toHaveText('Hugging Face Agents Course');
+ await expect(page.locator('.cred-actions a',{hasText:'Verify on Microsoft Learn'})).toHaveAttribute('href','https://learn.microsoft.com/en-us/users/kirankishorevenkatesan-3096/credentials/applied-skill/develop-an-agent-with-integrated-tools');
+ for(const asset of ['microsoft-integrated-agent.png','microsoft-integrated-agent-certificate.pdf','hugging-face-agents-certificate.webp'])expect((await page.request.get('/assets/credentials/'+asset)).ok()).toBe(true);
  await expect(page.locator('.cred-actions a',{hasText:'Verify on Credly'}).first()).toHaveAttribute('href','https://www.credly.com/badges/eedd31e6-fcfb-464d-85fa-26ec5571b8df/public_url');
  await expect(page.locator('.cred-actions a',{hasText:'Verify on Credly'}).nth(1)).toHaveAttribute('href','https://www.credly.com/badges/0b626870-1608-49a7-a3f2-e3c85dc56bd8/public_url');
  await expect(page.locator('.cred-actions a',{hasText:'Verify on Cyfrin'})).toHaveAttribute('href','https://profiles.cyfrin.io/u/kirankishore07/achievements/blockchain-basics');
