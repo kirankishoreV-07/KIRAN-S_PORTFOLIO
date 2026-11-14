@@ -38,7 +38,7 @@ test.describe('every control does what it says', () => {
     expect(await resumes.count()).toBeGreaterThanOrEqual(3);
     for (const el of await resumes.all()) {
       await expect(el).toHaveAttribute('download', '');
-      await expect(el).toHaveAttribute('href', '/assets/kiran-resume.pdf?v=a109d18e9db9');
+      await expect(el).toHaveAttribute('href', '/assets/kiran-resume.pdf?v=b561963a756e');
     }
     const pdf = await page.request.get((await resumes.first().getAttribute('href'))!);
     expect((await pdf.body()).subarray(0, 4).toString()).toBe('%PDF');

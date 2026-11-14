@@ -1,5 +1,5 @@
 export const intro = ["Hi, I’m Kiran, an AI developer building agentic AI, computer vision and cloud solutions.", "I turn real-world problems into working software—here’s a look at my work."];
-export const resumeUrl = '/assets/kiran-resume.pdf?v=a109d18e9db9';
+export const resumeUrl = '/assets/kiran-resume.pdf?v=b561963a756e';
 
 export type JourneyStop = { id:string; place:string; period:string; tags:string[]; body:string };
 export const journey: JourneyStop[] = [
